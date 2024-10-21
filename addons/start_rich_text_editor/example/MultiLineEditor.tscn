@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://u0mvxj2bdulu"]
+
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/src/MultilineEditor.gd" id="1_lcex7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
+bg_color = Color(0.422747, 0.239652, 0.117217, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="Theme" id="Theme_q2jcg"]
+Button/styles/normal = SubResource("StyleBoxFlat_d07m2")
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = SubResource("Theme_q2jcg")
+
+[node name="RichTextEditor" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 148.0
+offset_top = 82.0
+offset_right = 970.0
+offset_bottom = 490.0
+script = ExtResource("1_lcex7")
