@@ -1,22 +1,43 @@
-extends Control
+@icon("res://addons/start_rich_text_editor/src/icon.svg")
+class_name RichTextEditor extends Control
 var current_layout_y=0
 var start_pos:Vector2
 var rect_list:Array[Rect2]=[]
 var editing_line=0
-
 var selecting=false
 var start_line=0
 var start_posx=0
+@export var default_font_color:Color
+@export var default_font_size:=32
+var data:=[
+	[
+	{text="There is a mountain",font_color=Color.PINK,bg_color=Color.DARK_GOLDENROD,font_size=32},
+	{text="Hello World  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
+	{text="Hello",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
+	],
+	
+	[],
+	
+	[
+	{text="There is a line ",font_color=Color.PINK,font_size=32},
+	{text="  water  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
+	{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
+	]
+]
 
 func _ready() -> void:
 	start_pos=Vector2(0,0)
 	current_layout_y=start_pos.y
-	add_line()
-	add_line()
-	add_line()
-	#big_select(0,2)
-func add_line():
+	make_data_into_lines()
+
+func make_data_into_lines():
+	for line in data:
+		add_line(line)
+
+func add_line(content=[]):
 	var pl=PowerLineEdit.new()	
+	if !content.is_empty():
+		pl.text_list=content
 	pl.position=Vector2(start_pos.x,start_pos.y+current_layout_y)
 	add_child(pl)
 	var rect=pl.get_bound()
