@@ -1,0 +1,43 @@
+[gd_scene load_steps=5 format=3 uid="uid://pq5mxw15g1wi"]
+
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/src/LineEditor.gd" id="1_8vlcx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c0lji"]
+bg_color = Color(0.598792, 0.437897, 0.338082, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.264249, 0.174854, 0.0235172, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_it326"]
+bg_color = Color(0.731578, 0.557892, 0.451074, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.264249, 0.174854, 0.0235172, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="Theme" id="Theme_c0lji"]
+Button/styles/hover = SubResource("StyleBoxFlat_c0lji")
+Button/styles/normal = SubResource("StyleBoxFlat_it326")
+
+[node name="MyTextEditor" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -217.0
+offset_bottom = -514.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_c0lji")
+script = ExtResource("1_8vlcx")
