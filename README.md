@@ -45,7 +45,7 @@ lines->line->{text,control}
 
 control is a rect to place Control Node
 
-![](./docs/explanatory diagram.svg)
+![](./docs/explanatory diagram.png)
 
 #### Add init text
 
