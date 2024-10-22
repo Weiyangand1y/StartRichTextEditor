@@ -2,7 +2,7 @@
 
 Rich text editor for Godot
 
-![](docs\video.gif)
+![](./docs/video.gif)
 
 using  `TextLine` to draw text and `Control` to draw other(such as Image, Button, even a scene!!)
 
@@ -45,7 +45,7 @@ lines->line->{text,control}
 
 control is a rect to place Control Node
 
-![](docs/explanatory diagram.svg)
+![](./docs/explanatory diagram.svg)
 
 #### Add init text
 
