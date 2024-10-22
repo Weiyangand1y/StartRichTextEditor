@@ -50,7 +50,7 @@ use Array[Dictionary], if you want to add pure text, you can parse text to Array
 
 the dict is:
 
-```json
+```c++
 {
     "text":String
     "font_color":Color
@@ -66,6 +66,10 @@ the dict is:
     "c":Control
 }
 ```
+
+A code example is in res://addons/start_rich_text_editor/example/rich_text_editor_1.gd
+
+
 
 #### Add Control
 

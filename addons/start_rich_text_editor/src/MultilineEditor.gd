@@ -7,43 +7,60 @@ var editing_line=0
 var selecting=false
 var start_line=0
 var start_posx=0
-@export var default_font_color:Color
-@export var default_font_size:=32
-var data:=[
-	[
-	{text="There is a mountain",font_color=Color.PINK,bg_color=Color.DARK_GOLDENROD,font_size=32},
-	{text="Hello World  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
-	{text="Hello",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
-	],
-	
-	[],
-	
-	[
-	{text="There is a line ",font_color=Color.PINK,font_size=32},
-	{text="  water  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
-	{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
-	]
-]
 
+@export var default_font_color:=Color.WHITE
+@export var default_font_size:=32
+@export var default_bg_color:=Color.TRANSPARENT
+@export var selection_color:=Color.WHEAT
+var default_parser:Callable
+var data:=[]
 func _ready() -> void:
 	start_pos=Vector2(0,0)
 	current_layout_y=start_pos.y
+	set_data()
 	make_data_into_lines()
-
+	set_control()
+func set_control():
+	pass
+func set_data():
+	pass
+func add_control(line_index:int,key:String,control:Control):
+	get_child(line_index).add_control(key,control)
 func make_data_into_lines():
-	for line in data:
-		add_line(line)
+	for line_data in data:
+		var line=add_line(line_data)
+		if default_parser:
+			line.parser=default_parser
 
-func add_line(content=[]):
+func add_line(content=[])->PowerLineEdit:
 	var pl=PowerLineEdit.new()	
 	if !content.is_empty():
 		pl.text_list=content
 	pl.position=Vector2(start_pos.x,start_pos.y+current_layout_y)
+	pl.default_bg_color=default_bg_color
+	pl.default_font_color=default_font_color
+	pl.default_font_size=default_font_size
+	pl.selection_color=selection_color
+	pl.connect("line_empty",func(line:PowerLineEdit):
+		print('line empty')
+		var index=line.get_index()
+		editing_line=index-1
+		var pre_line=get_children()[editing_line] as PowerLineEdit
+		pre_line.edit()
+		pre_line.caret_move_end()
+		line.queue_free()
+		await get_tree().process_frame
+		relayout()
+		)
+	pl.connect("text_change",func(a):
+		print('text')
+		)
 	add_child(pl)
 	var rect=pl.get_bound()
 	rect.position+=Vector2(start_pos.x,start_pos.y+current_layout_y)
 	current_layout_y+=rect.size.y
 	rect_list.push_back(rect)
+	return pl
 func get_click_line():
 	var mpos=get_local_mouse_position()
 	for i in rect_list.size():	
@@ -58,13 +75,15 @@ func is_left_released(event: InputEvent):
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.is_released():
 		return true
 	return false
+func _process(delta: float) -> void:
+	if selecting:
+		big_select(start_line,get_click_line(),start_posx,get_local_mouse_position().x-start_pos.x)
 func _input(event: InputEvent) -> void:
 	if is_left_pressed(event):
 		selecting=true
 		start_line=get_click_line()
+		editing_line=start_line
 		start_posx=get_local_mouse_position().x-start_pos.x
-	if event is InputEventMouseMotion and selecting:
-		big_select(start_line,get_click_line(),start_posx,get_local_mouse_position().x-start_pos.x)
 	if is_left_released(event):
 		selecting=false
 	if event.is_action_pressed("ui_text_newline"):
@@ -74,9 +93,21 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_up"):
 		move_up()
 func insert_line():
-	var pl=PowerLineEdit.new()	
-	add_child(pl)
-	move_child(pl,editing_line+1)
+	var current_line=get_child(editing_line) as PowerLineEdit
+	var right=current_line.get_right()
+	
+	var line=add_line()
+	line.text_list=right
+	line.caret_move_start()
+	line.relayout()
+	current_line.move_right_controls_to(line)
+	current_line.remove_right()
+	current_line.unedit()
+	
+	
+	move_child(line,editing_line+1)
+	
+	line.relayout()
 	relayout()
 	pass
 
@@ -89,8 +120,11 @@ func relayout():
 		current_layout_y+=rect.size.y
 
 func big_select(from_line,to_line,from_posx,to_posx):
+	
 	if from_line==to_line:
 		return
+	for line:PowerLineEdit in get_children():
+		line.show_selection=false
 	if from_line>to_line:
 		var tmp1=from_line;from_line=to_line;to_line=tmp1
 		var tmp2=from_posx;from_posx=to_posx;to_posx=tmp2
@@ -99,10 +133,11 @@ func big_select(from_line,to_line,from_posx,to_posx):
 		line.select_all()
 	var fl=get_child(from_line) as PowerLineEdit
 	var el=get_child(to_line) as PowerLineEdit
-	fl.select_to_right(from_posx)
+
 	fl.show_selection=true
-	el.select_to_left(to_posx)
+	fl.select_to_right(from_posx)
 	el.show_selection=true
+	el.select_to_left(to_posx)	
 	pass
 func move_up():
 	var oline=get_child(editing_line) as PowerLineEdit

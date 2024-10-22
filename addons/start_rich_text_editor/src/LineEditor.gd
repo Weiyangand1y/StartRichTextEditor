@@ -3,20 +3,17 @@ class_name PowerLineEdit
 @export var font:Font
 @export var show_bound:=false
 signal text_change(tl:Array[Dictionary])
+signal line_empty(p:PowerLineEdit)
+
 var show_selection:=false
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
 @export var default_font_color:=Color.WHITE
 @export var selection_color:=Color.WHEAT
 var text_list:=[
-	{text="Hello  ",font_color=Color.PALE_GOLDENROD,font_size=48},
-	{key='C0',size=Vector2(60,60)},
-	{text="Helloh2World  ",font_color=Color.PINK},
-	{text="Hello World  ",font_color=Color.SKY_BLUE},
-	{key='C1',size=Vector2(60,60)},
-	{text="Hell",font_color=Color.SKY_BLUE,font_size=32},
+	{text=' '}
 ]
-
+var parser:Callable
 #region State Data
 # layout state
 var rect_list:Array[Rect2]=[]
@@ -48,6 +45,8 @@ var editing:=false
 #init--------------------------------------------------------------
 #region init
 func start_init():
+	connect("line_empty",func(a):
+		print('empty'))
 	DisplayServer.window_set_ime_active(true)
 	if !font:
 		font=SystemFont.new()
@@ -70,17 +69,13 @@ func _ready() -> void:
 func init():
 	start_init()
 	layout()
-	add_control('C0',Button.new())
-	add_control('C1',Button.new())
-	add_control('C2',Button.new())
 #endregion
 # about control--------------------------------------------------
 #region Control Rect
 func get_control_index(key:String):
-	for i in text_list.size():
-		if text_list[i].has('key') and text_list[i].key==key:
-			return i
-	return -1
+	return text_list.find_custom(func(item):
+		return item.has('key') and item.key==key
+	)
 func add_control(key:String,control:Control):
 	var ci=get_control_index(key)
 	if ci==-1:return
@@ -133,7 +128,7 @@ func relayout():
 	layout()
 	for i in text_list.size():
 		if text_list[i].has('key') and text_list[i].has('c'):
-			text_list[i]['c'].position=rect_list[i].position
+			text_list[i]['c'].position=rect_list[i].position+start_position
 	queue_redraw()
 #endregion
 # render--------------------------------------------------------------
@@ -264,10 +259,12 @@ func _input(event: InputEvent) -> void:
 # caret ------------------------------------------------------------
 #region caret
 func caret_pos_set(mpos):	
+	if mpos.x>get_bound().size.x:
+		caret_move_end()
+		return
 	for index in rect_list.size():
 		var rect=rect_list[index] as Rect2
-		if rect.has_point(mpos):
-			#print('index: ',index)
+		if mpos.x>rect.position.x and mpos.x<rect.position.x+rect.size.x:
 			caret_block_index=index
 			if !is_text(caret_block_index):
 				break
@@ -332,7 +329,7 @@ func get_selection():
 	return part
 func select(from,to,f2,t2):
 	#print('select from %d %d to %d %d '%[from,f2,to,t2]) 
-	# 修改前后排序
+	# 修改前后排序 swap
 	if from>to:
 		var tmp=from;from=to;to=tmp;
 		var tmp2=f2;f2=t2;t2=tmp2
@@ -340,9 +337,9 @@ func select(from,to,f2,t2):
 	select_start_col=f2
 	select_end_index=to
 	select_end_col=t2
-	# 添加选中背景
+	# 添加选中背景 selection background rect
 	rl=rect_list.slice(from,to+1)
-	#print(rl) 
+	# the first and last
 	var i1=text_list[from]
 	var i2=text_list[to]
 	if(i1.has('text')):
@@ -366,23 +363,33 @@ func select_all():
 	pass
 func select_to_left(posx):
 	caret_pos_set(Vector2(posx,40))
-	if !is_text(select_end_index):
+	if !is_text(caret_block_index):
 		return
-	select_end_col=text_list[select_end_index].text.length()
-	#print('--->',caret_block_index)
-	select(caret_block_index, 0,          
-			caret_col, 0)
+	select_start_index=0
+	select_start_col=0
+	select_end_index=caret_block_index
+	select_end_col=caret_col
+	
+	select(select_start_index, select_end_index,      
+			select_start_col,select_end_col)
 	pass
 func select_to_right(posx):
+	print(posx)
 	caret_pos_set(Vector2(posx,40))
-	select_end_col=text_list[select_end_index].text.length()
-	#print('--->',caret_block_index)
-	select(caret_block_index, textline_list.size()-1,           
-			caret_col, select_end_col)
+	select_start_index=caret_block_index
+	print(caret_block_index)
+	select_start_col=caret_col
+	select_end_index=textline_list.size()-1
+	select_end_col=text_list[select_end_index].text.length()	
+	select(select_start_index, select_end_index,           
+			select_start_col, select_end_col)
 #endregion
 #delete--------------------------------------------------------
 #region delete
-
+# problems: 
+# 1. text or control
+# 2. block begin
+# 3. line begin
 func back_delete():
 	if caret_col==0 and caret_block_index==0:return
 	var to_left=false
@@ -409,16 +416,18 @@ func delete_control_rect():
 func delete_text():
 	var item=text_list[caret_block_index]
 	var text:String=item.text	
-	caret_move_left()
+	
 	#print('remove: %d %d'%[caret_block_index,caret_col])
-	text=text.erase(caret_col)
+	text=text.erase(caret_col-1)
 	item.text=text
-
 	if(text.length()==0 and text_list.size()!=1):
 		text_list.remove_at(caret_block_index)	
-	#if(caret_col==0):
-		#caret_move_left()
-	pass
+			
+	if(text.length()==0 and text_list.size()==1):
+		line_empty.emit(self)
+		return
+	caret_move_left()
+	
 #endregion
 #insert---------------------------------------------------------
 #region insert text
@@ -436,26 +445,9 @@ func insert(text:String):
 # parser----------------------------------------------------------------
 #region parser
 func parse():
-	parse_test()
-func parse_test():
-	for i in text_list.size():
-		if(is_text(i)):
-			var item_text=text_list[i].text as String
-			if(item_text.contains('img')):
-				var splits=item_text.split('img')
-				text_list.remove_at(i)
-				text_list.insert(i,{
-					key='ib',size=Vector2(64,64)
-				})
-				text_list.insert(i+1,{
-					text=splits[1],font_color=Color.PALE_GOLDENROD,bg_color=Color.DARK_GOLDENROD,font_size=64
-				})
-				var btn=TextureButton.new()
-				btn.stretch_mode=TextureButton.STRETCH_KEEP_ASPECT
-				btn.texture_normal=preload("res://addons/start_rich_text_editor/src/icon.svg")
-				add_control('ib',btn)
-	refresh_caret()
-	relayout()
+	if parser:
+		parser.call(self)
+
 #endregion
 
 
@@ -496,3 +488,25 @@ func get_width2():
 	var tl=TextLine.new()
 	tl.add_string(text,font,font_size)
 	return tl.get_line_width()
+# new a line  -------------------------------------
+func get_right():
+	var t1=text_list.slice(caret_block_index)
+	if t1.is_empty(): return []
+	if 'text' in t1[0]:
+		t1[0].text=t1[0].text.substr(caret_col)
+	return t1
+func remove_right():
+	text_list=text_list.slice(0,caret_block_index+1)
+	if 'text' in text_list[-1]:
+		text_list[-1].text=text_list[-1].text.substr(0,caret_col)
+	relayout()
+func push_front(new_text_list:Array):
+	new_text_list.append_array(textline_list)
+	text_list=new_text_list
+	relayout()
+func move_right_controls_to(toline:PowerLineEdit):
+	var items=text_list.slice(caret_block_index).filter(func(item):return item.has('key') and item.has('c'))
+	for item in items:
+		var control_node=item.c as Control
+		remove_child(control_node)
+		toline.add_control(item.key,control_node)

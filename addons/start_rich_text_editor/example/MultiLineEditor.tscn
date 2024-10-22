@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://u0mvxj2bdulu"]
+[gd_scene load_steps=5 format=3 uid="uid://u0mvxj2bdulu"]
 
-[ext_resource type="Script" path="res://addons/start_rich_text_editor/src/MultilineEditor.gd" id="1_lcex7"]
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
+[ext_resource type="Texture2D" uid="uid://dc1qp7v7jcx00" path="res://addons/start_rich_text_editor/src/icon.svg" id="2_2sidd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
 bg_color = Color(0.422747, 0.239652, 0.117217, 1)
@@ -26,3 +27,15 @@ offset_top = 82.0
 offset_right = 970.0
 offset_bottom = 490.0
 script = ExtResource("1_lcex7")
+
+[node name="Control" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 306.0
+offset_bottom = 319.0
+
+[node name="TextureRect" type="TextureRect" parent="Control"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("2_2sidd")
