@@ -52,8 +52,16 @@ func add_line(content=[])->PowerLineEdit:
 		await get_tree().process_frame
 		relayout()
 		)
-	pl.connect("text_change",func(a):
-		print('text')
+	pl.connect("delete_line_start",func(line:PowerLineEdit):
+		var index=line.get_index() 
+		var pre_line=get_child(index-1) as PowerLineEdit
+		var right=line.get_right()
+		pre_line.text_list.append_array(right)
+		pre_line.relayout()
+		pre_line.edit()
+		line.move_right_controls_to(pre_line)
+		line.queue_free()
+		relayout()
 		)
 	add_child(pl)
 	var rect=pl.get_bound()
@@ -120,7 +128,6 @@ func relayout():
 		current_layout_y+=rect.size.y
 
 func big_select(from_line,to_line,from_posx,to_posx):
-	
 	if from_line==to_line:
 		return
 	for line:PowerLineEdit in get_children():
@@ -140,6 +147,8 @@ func big_select(from_line,to_line,from_posx,to_posx):
 	el.select_to_left(to_posx)	
 	pass
 func move_up():
+	selecting=false
+	if editing_line==0:return
 	var oline=get_child(editing_line) as PowerLineEdit
 	var posx=oline.get_caret_posx()
 	oline.unedit()
@@ -149,6 +158,7 @@ func move_up():
 	line.edit()
 	pass
 func move_down():
+	if editing_line==get_children().size()-1:return
 	var oline=get_child(editing_line) as PowerLineEdit
 	var posx=oline.get_caret_posx()
 	oline.unedit()

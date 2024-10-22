@@ -2,9 +2,12 @@ extends Control
 class_name PowerLineEdit
 @export var font:Font
 @export var show_bound:=false
+## emit when text change
 signal text_change(tl:Array[Dictionary])
+## emit when line is empty
 signal line_empty(p:PowerLineEdit)
-
+## emit when caret at the beginning of the line
+signal delete_line_start(p:PowerLineEdit)
 var show_selection:=false
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
@@ -171,7 +174,7 @@ func update_ime_pos():
 		global_position
 		+rect_list[caret_block_index].position
 		+caret_pos_offsetx*Vector2.RIGHT
-		+get_bound().size.y*Vector2.DOWN
+		+get_bound().size.y*2*Vector2.DOWN
 		)
 func draw_caret():
 	var rect=rect_list[caret_block_index]
@@ -210,7 +213,7 @@ func is_left_released(event: InputEvent):
 	return false
 func _input(event: InputEvent) -> void:		
 	if(is_left_pressed(event)):	
-		on_select=true	
+		
 		var mpos=get_local_mouse_position()
 		caret_pos_set(mpos)
 		ssc=caret_col
@@ -218,9 +221,11 @@ func _input(event: InputEvent) -> void:
 		update_ime_pos()
 		if get_bound().has_point(mpos):
 			edit()
+			on_select=true
 		elif mpos.y>0 and mpos.y<get_bound().size.y and mpos.x>0:
 			edit()
 			caret_move_end()
+			on_select=true
 		else: unedit()
 		queue_redraw()
 	# ---------------------------------------------
@@ -374,10 +379,10 @@ func select_to_left(posx):
 			select_start_col,select_end_col)
 	pass
 func select_to_right(posx):
-	print(posx)
+	#print(posx)
 	caret_pos_set(Vector2(posx,40))
 	select_start_index=caret_block_index
-	print(caret_block_index)
+	#print(caret_block_index)
 	select_start_col=caret_col
 	select_end_index=textline_list.size()-1
 	select_end_col=text_list[select_end_index].text.length()	
@@ -391,7 +396,9 @@ func select_to_right(posx):
 # 2. block begin
 # 3. line begin
 func back_delete():
-	if caret_col==0 and caret_block_index==0:return
+	if caret_col==0 and caret_block_index==0:
+		emit_signal("delete_line_start",self)
+		return
 	var to_left=false
 	if caret_col==0:
 		caret_block_index-=1
@@ -417,7 +424,6 @@ func delete_text():
 	var item=text_list[caret_block_index]
 	var text:String=item.text	
 	
-	#print('remove: %d %d'%[caret_block_index,caret_col])
 	text=text.erase(caret_col-1)
 	item.text=text
 	if(text.length()==0 and text_list.size()!=1):

@@ -2,15 +2,16 @@
 
 Rich text editor for Godot
 
+![](docs\video.gif)
+
 using  `TextLine` to draw text and `Control` to draw other(such as Image, Button, even a scene!!)
 
-However, there are still a lot of bugs, so it's better to learn from it and then fix or extend it.
+However, there are still many bugs (**not recommended for use in serious projects)**, so it’s better to learn from it, and then fix or extend it.
 
 #### No finished:
 
-* new & delete line
 * delete selection
-* enough copy&paste
+* good copy&paste
 * perfect caret move
 * enough config
 * save&load content
@@ -43,6 +44,8 @@ However, there are still a lot of bugs, so it's better to learn from it and then
 lines->line->{text,control}
 
 control is a rect to place Control Node
+
+![](docs/explanatory diagram.svg)
 
 #### Add init text
 

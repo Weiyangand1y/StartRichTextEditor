@@ -2,8 +2,8 @@ extends RichTextEditor
 func set_data() -> void:
 	data =	[[
 	{text="There is a mountain",font_color=Color.PINK,bg_color=Color.DARK_GOLDENROD,font_size=32},
-	{text="Hello World  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
-	{text="Hello",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
+	{text="Hello World  ",font_color=Color.SKY_BLUE,bg_color=Color.DARK_BLUE,font_size=32},
+	{text="Hello",font_color=Color.SKY_BLUE,bg_color=Color.from_string("#694a87",Color.TRANSPARENT),font_size=32},
 	],
 	
 	[
