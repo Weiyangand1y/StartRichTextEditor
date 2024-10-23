@@ -112,7 +112,10 @@ func pre_layout_text(item:Dictionary):
 	var d=text.get_line_descent()
 	h1=max(h1,text.get_line_ascent())
 	h2=max(h2,text.get_line_descent())
-	rect_list.push_back(Rect2(next_layout_x,start_position.y,s.x,s.y-d))
+	var rect=Rect2(
+		next_layout_x,start_position.y,
+		s.x,          s.y-d)
+	rect_list.push_back(rect)
 	next_layout_x+=s.x
 func layout():
 	for item in text_list:
@@ -121,9 +124,11 @@ func layout():
 		else:
 			pre_layout_text(item)
 	for i in rect_list.size():
-		if text_list[i].has('key'):continue
-		var d=textline_list[i].get_line_ascent()
-		rect_list[i].position.y=h1-d+start_position.y
+		if text_list[i].has('key'):
+			rect_list[i].position.y=start_position.y+h1-rect_list[i].size.y
+		else:
+			var d=textline_list[i].get_line_ascent()
+			rect_list[i].position.y=h1-d+start_position.y
 func relayout():
 	textline_list.clear()
 	rect_list.clear()
@@ -131,7 +136,7 @@ func relayout():
 	layout()
 	for i in text_list.size():
 		if text_list[i].has('key') and text_list[i].has('c'):
-			text_list[i]['c'].position=rect_list[i].position+start_position
+			text_list[i]['c'].position=rect_list[i].position
 	queue_redraw()
 #endregion
 # render--------------------------------------------------------------
@@ -197,6 +202,8 @@ func edit():
 	select_start_index=0
 	rl.clear()
 	update_ime_pos()
+	for c:Control in get_children():
+		c.release_focus()
 func unedit():
 	editing=false
 	show_selection=false
@@ -212,8 +219,7 @@ func is_left_released(event: InputEvent):
 		return true
 	return false
 func _input(event: InputEvent) -> void:		
-	if(is_left_pressed(event)):	
-		
+	if(is_left_pressed(event)):
 		var mpos=get_local_mouse_position()
 		caret_pos_set(mpos)
 		ssc=caret_col
@@ -246,7 +252,6 @@ func _input(event: InputEvent) -> void:
 		var uc=event.unicode
 		if(uc>256 or (uc>=32 and uc<=126)):
 			var s=String.chr(uc)
-			#print(s)
 			insert(s)
 	if(event.is_action_pressed("ui_left")):
 		caret_move_left()
@@ -304,9 +309,10 @@ func caret_move_left():
 func caret_move_right():
 	caret_col+=1
 	var b=text_list[caret_block_index].has('key')
-	if(b or caret_col>=text_list[caret_block_index].text.length()):
-		caret_col=0
-		caret_block_index+=1
+	if(b or caret_col>=text_list[caret_block_index].text.length()):		
+		if caret_block_index<text_list.size()-1:
+			caret_block_index+=1
+			caret_col=0
 	refresh_caret()		
 func caret_move_end():
 	var last_index=text_list.size()-1

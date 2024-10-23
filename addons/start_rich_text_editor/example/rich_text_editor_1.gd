@@ -21,7 +21,7 @@ func set_data() -> void:
 	{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
 	{key='btn1',size=Vector2(64,64)}
 	]]
-	default_parser=parse_test
+	default_parser=parse_test2
 	
 func set_control():
 	add_control(1,'c1',Button.new())
@@ -29,6 +29,31 @@ func set_control():
 	var button=Button.new()
 	button.text='A button'
 	add_control(2,'btn1',button)
+func parse_replace_to(line:PowerLineEdit,str:String,to:Dictionary):
+	for i in line.text_list.size():
+		if(line.is_text(i)):
+			var item=line.text_list[i] as Dictionary
+			var item_text=item.text as String
+			if(item_text.contains(str)):
+				var left_item=item.duplicate()
+				var right_item=item.duplicate()
+				var splits=item_text.split(str)
+				left_item.text=splits[0]
+				right_item.text=splits[1]
+				line.text_list.remove_at(i)
+				line.text_list.insert(i,left_item)
+				line.text_list.insert(i+1,to)
+				line.text_list.insert(i+2,right_item)
+				if to.has('key') and to.has('c'):
+					line.relayout()
+					line.add_child(to.c)
+	line.refresh_caret()
+	line.relayout()
+func parse_test2(line:PowerLineEdit):
+	#parse_replace_to(line,'we',{text='HHH'})
+	var btn=Button.new()
+	btn.text='click'
+	parse_replace_to(line,'btn',{key='',size=Vector2.ONE*32,c=btn})
 func parse_test(line:PowerLineEdit):
 	for i in line.text_list.size():
 		if(line.is_text(i)):

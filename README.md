@@ -32,11 +32,9 @@ However, there are still many bugs (**not recommended for use in serious project
 #### Start
 
 * Add Node `RichTextEditor` (Dont't add other node to this node!!!) to your tree and run
+* there is a example scene you can run:
 
-* there is a example scene you can run: 
-
-​	res://addons/start_rich_text_editor/example/MultiLineEditor.tscn
-
+  res://addons/start_rich_text_editor/example/MultiLineEditor.tscn
 * Add Node `RichTextEditor`and extend the script
 
 #### Basic
@@ -45,13 +43,15 @@ lines->line->{text,control}
 
 control is a rect to place Control Node
 
-![](./docs/explanatory diagram.png)
+![](./docs/explanatory_diagram.png)
 
 #### Add init text
 
-use Array[Dictionary], if you want to add pure text, you can parse text to Array[Dictionary]
+Use Array[Dictionary], if you want to add pure text, you can parse text to Array[Dictionary]
 
 the dict is:
+
+Text Block:
 
 ```c++
 {
@@ -61,6 +61,8 @@ the dict is:
     "font_size":int
 }
 ```
+
+Control Block:
 
 ```c++
 {
@@ -72,27 +74,23 @@ the dict is:
 
 A code example is in res://addons/start_rich_text_editor/example/rich_text_editor_1.gd
 
-
-
 #### Add Control
 
-you can use `add_control` or set 'c' in dict, and then add_child
+You can use `add_control` or set 'c' in dict, and then add_child
 
 #### Add parser
 
-each time when text change, a signal will be emitted to call parse
+Each time when text change, a signal will be emitted to call parse
 
-you can extend PowerLineEdit to override it.
+You can use Callable(line:PowerLineEdit) to set `default_parser` in MultilineEditor.
 
 #### Application
 
-command line
+* command line
+* code edit
 
-code edit
-
-chat box
-
-doc
+* chat box
+* doc
 
 ---
 
@@ -103,4 +101,3 @@ doc
 用TextLine渲染文字和Control进行渲染控件（之后在控件里塞什么都行，图片，场景）
 
 现在很多bugs，属于demo一类的完成度，所以最好从中学习和修改
-
