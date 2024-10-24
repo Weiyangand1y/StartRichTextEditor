@@ -7,7 +7,7 @@ var editing_line=0
 var selecting=false
 var start_line=0
 var start_posx=0
-
+var max_width=0
 @export var default_font_color:=Color.WHITE
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
@@ -45,7 +45,8 @@ func add_line(content=[])->PowerLineEdit:
 	pl.default_font_size=default_font_size
 	pl.selection_color=selection_color
 	pl.connect("line_empty",func(line:PowerLineEdit):
-		print('line empty')
+		if line.get_index()!=editing_line:			
+			return
 		var index=line.get_index()
 		editing_line=index-1
 		var pre_line=get_children()[editing_line] as PowerLineEdit
@@ -58,11 +59,14 @@ func add_line(content=[])->PowerLineEdit:
 	pl.connect("caret_change",func(p):
 		emit_signal("caret_change",p))
 	pl.connect("delete_line_start",func(line:PowerLineEdit):
+		if line.get_index()!=editing_line:			
+			return
 		var index=line.get_index() 
 		var pre_line=get_child(index-1) as PowerLineEdit
 		var right=line.get_right()
 		pre_line.text_list.append_array(right)
 		pre_line.relayout()
+		pre_line.caret_move_end()
 		pre_line.edit()
 		line.move_right_controls_to(pre_line)
 		line.queue_free()
@@ -108,6 +112,7 @@ func _input(event: InputEvent) -> void:
 		move_down()
 	if event.is_action_pressed("ui_up"):
 		move_up()
+# when 'Enter' pressed
 func insert_line():
 	var current_line=get_child(editing_line) as PowerLineEdit
 	var right=current_line.get_right()
@@ -128,14 +133,16 @@ func insert_line():
 	pass
 
 func relayout():
+	rect_list.clear()
 	current_layout_y=start_pos.y
-	var max_width=0
+	max_width=0
 	for line:PowerLineEdit in get_children():
 		line.position=Vector2(start_pos.x,start_pos.y+current_layout_y)
 		var rect=line.get_bound()
 		rect.position+=Vector2(start_pos.x,start_pos.y+current_layout_y)
 		current_layout_y+=rect.size.y
 		max_width=max(max_width,rect.size.x)
+		rect_list.push_back(rect)
 	custom_minimum_size=Vector2(max_width,current_layout_y)
 
 func big_select(from_line,to_line,from_posx,to_posx):

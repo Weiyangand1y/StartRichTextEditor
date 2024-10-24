@@ -137,6 +137,8 @@ func layout():
 func relayout():
 	textline_list.clear()
 	rect_list.clear()
+	h1=0
+	h2=0
 	next_layout_x=start_position.x
 	layout()
 	for i in text_list.size():
@@ -151,6 +153,8 @@ func render():
 	# draw bg
 	for i in text_list.size():
 		var rect=rect_list[i] as Rect2
+		rect.size.y=h1+h2-3
+		rect.position.y=3
 		if(text_list[i].has('text')):
 			draw_rect(rect,text_list[i].get('bg_color',default_bg_color))
 	# draw selection
@@ -235,8 +239,14 @@ func _input(event: InputEvent) -> void:
 			emit_signal("caret_change",self)
 			on_select=true
 		elif mpos.y>0 and mpos.y<get_bound().size.y and mpos.x>0:
-			edit()
-			caret_move_end()
+			var is_to_edit=true
+			if get_parent() is RichTextEditor:
+				var max_width=get_parent_area_size().x
+				if mpos.x>max_width:
+					is_to_edit=false
+			if is_to_edit:
+				edit()
+				caret_move_end()
 			on_select=true
 		else: unedit()
 		queue_redraw()
@@ -271,6 +281,10 @@ func _input(event: InputEvent) -> void:
 		caret_move_end()
 	if(event.is_action_pressed("ui_home")):
 		caret_move_start()
+	if(event is InputEventKey):
+		event=event as InputEventKey
+		if event.alt_pressed and event.keycode==KEY_D:
+			split_text_block()
 #endregion
 # caret ------------------------------------------------------------
 #region caret
@@ -490,7 +504,9 @@ func simple_copy():
 func is_text(index):
 	return text_list[index].has('text')
 func get_bound()->Rect2:
-	return Rect2(start_position.x,start_position.y,next_layout_x-start_position.x,h1+h2)
+	return Rect2(
+		start_position.x,start_position.y,
+		next_layout_x-start_position.x,h1+h2)
 
 func get_width(text:String,font_size):
 	tmp_textline.clear()
@@ -508,7 +524,7 @@ func get_width2():
 # new a line  -------------------------------------
 #region To new a line
 func get_right():
-	var t1=text_list.slice(caret_block_index)
+	var t1=text_list.slice(caret_block_index).duplicate(true)
 	if t1.is_empty(): return []
 	if 'text' in t1[0]:
 		t1[0].text=t1[0].text.substr(caret_col)
@@ -516,7 +532,8 @@ func get_right():
 func remove_right():
 	text_list=text_list.slice(0,caret_block_index+1)
 	if 'text' in text_list[-1]:
-		text_list[-1].text=text_list[-1].text.substr(0,caret_col)
+		var text=text_list[-1].text
+		text_list[-1].text=text.substr(0,caret_col)
 	relayout()
 func push_front(new_text_list:Array):
 	new_text_list.append_array(textline_list)
@@ -529,3 +546,15 @@ func move_right_controls_to(toline:PowerLineEdit):
 		remove_child(control_node)
 		toline.add_control(item.key,control_node)
 #endregion
+func split_text_block():
+	if !is_text(caret_block_index):
+		return
+	var item=text_list[caret_block_index] as Dictionary
+	var item1=item.duplicate()
+	var item2=item.duplicate()
+	item1.text=(item.text as String).substr(0,caret_col)
+	item2.text=item.text.substr(caret_col,item.text.length()-caret_col)
+	text_list.remove_at(caret_block_index)
+	text_list.insert(caret_block_index,item1)
+	text_list.insert(caret_block_index+1,item2)
+	relayout()

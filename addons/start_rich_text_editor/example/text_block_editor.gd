@@ -30,7 +30,6 @@ func _ready() -> void:
 		$FontSize.value=v
 		)
 func update_component(line:PowerLineEdit):
-	print('--------------')
 	var item=line.text_list[line.caret_block_index] as Dictionary
 	if !line.is_text(line.caret_block_index): return
 	$FontColor.color=item.font_color
