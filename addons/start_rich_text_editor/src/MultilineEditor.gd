@@ -12,6 +12,7 @@ var start_posx=0
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
 @export var selection_color:=Color.WHEAT
+@export var caret_color:=Color.BLACK
 var default_parser:Callable
 var data:=[]
 func _ready() -> void:

@@ -13,6 +13,7 @@ var show_selection:=false
 @export var default_bg_color:=Color.TRANSPARENT
 @export var default_font_color:=Color.WHITE
 @export var selection_color:=Color.WHEAT
+@export var caret_color:=Color.BLACK
 var text_list:=[
 	{text=' '}
 ]
@@ -131,6 +132,7 @@ func layout():
 		else:
 			var d=textline_list[i].get_line_ascent()
 			rect_list[i].position.y=h1-d+start_position.y
+	custom_minimum_size=get_bound().size
 func relayout():
 	textline_list.clear()
 	rect_list.clear()
@@ -186,7 +188,7 @@ func update_ime_pos():
 func draw_caret():
 	var rect=rect_list[caret_block_index]
 	var caret_pos=rect.position+Vector2.RIGHT*caret_pos_offsetx
-	var color=Color.YELLOW
+	var color=caret_color
 	color.a=transparent
 	draw_line(
 		caret_pos,
@@ -332,9 +334,13 @@ func get_caret_posx()->float:
 
 # select-----------------------------------------------------------
 #region select
+# condition: 0,1,1+
 func get_selection():
 	var part=text_list.slice(select_start_index,select_end_index+1);
-	if(part.size()>1):
+	part=part.duplicate(true)
+	if part.size()==1:
+		part[0].text=part[0].text.substr(select_start_col,select_end_col-select_start_col)
+	elif(part.size()>1):
 		if is_text(select_start_index):
 			part[0].text=part[0].text.substr(select_start_col)
 		if is_text(select_end_index):
@@ -467,19 +473,13 @@ func parse():
 # copy & paste ---------------------------------------------------------
 #region copy & paste
 func simple_copy():
-	var s_start_index=select_start_index
-	var s_end_index=select_end_index
-	var s_start_col=select_start_col
-	var s_end_col=select_end_col
 	var text=''
-	if(s_start_index==s_end_index and is_text(s_start_index)):
-		var src_text=text_list[s_start_index].text as String
-		text=text_list[s_start_index].text.substr(s_start_col,s_end_col-s_start_col)
-
-	else:
-		pass
+	var item_list=get_selection() as Array[Dictionary]
+	for item in item_list:
+		if item.has('text'):
+			text+=item.text
 	DisplayServer.clipboard_set(text)
-	#print(get_selection())
+	print(text)
 #endregion
 
 

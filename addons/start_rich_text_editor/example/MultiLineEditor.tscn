@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://u0mvxj2bdulu"]
+[gd_scene load_steps=6 format=3 uid="uid://u0mvxj2bdulu"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
+[ext_resource type="Texture2D" uid="uid://domtnkwrphl7k" path="res://docs/explanatory_diagram.png" id="2_2sidd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
 bg_color = Color(0.422747, 0.239652, 0.117217, 1)
@@ -17,7 +18,7 @@ content_margin_left = 11.0
 content_margin_top = 11.0
 content_margin_right = 11.0
 content_margin_bottom = 11.0
-bg_color = Color(0, 0, 0, 1)
+bg_color = Color(0.894922, 0.894922, 0.894922, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -46,3 +47,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_lcex7")
 [node name="RichTextEditor" type="Control" parent="ScrollContainer"]
 layout_mode = 2
 script = ExtResource("1_lcex7")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 418.0
+offset_top = 188.0
+offset_right = 674.0
+offset_bottom = 444.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_2sidd")

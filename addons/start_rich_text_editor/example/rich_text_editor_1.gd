@@ -1,22 +1,22 @@
 extends RichTextEditor
 func set_data() -> void:
 	data =	[[
-	{text="There is a mountain",font_color=Color.PINK,bg_color=Color.DARK_GOLDENROD,font_size=32},
-	{text="Hello World  ",font_color=Color.SKY_BLUE,bg_color=Color.DARK_BLUE,font_size=32},
-	{text="Hello",font_color=Color.SKY_BLUE,bg_color=Color.from_string("#694a87",Color.TRANSPARENT),font_size=32},
+	{text="The sun was setting ",font_color=Color.PINK,bg_color=Color.hex(0xf3f2c0ff),font_size=32},
+	{text="over the rolling hills ",font_color=Color.SKY_BLUE,bg_color=Color.hex(0xcbe0deff),font_size=32},
+	{text="the rolling hills",font_color=Color.SKY_BLUE,bg_color=Color.from_string("#694a87",Color.TRANSPARENT),font_size=32},
 	],
 	
 	[
-	{text="Hello  ",font_color=Color.PALE_GOLDENROD,font_size=48},
+	{text="green meadow  ",font_color=Color.hex(0x8cbfc2ff),font_size=48},
 	{key='c1',size=Vector2(60,60)},
-	{text="Helloh2World  ",font_color=Color.PINK},
+	{text="Helloh2World  ",font_color=Color.hex(0xa4c263ff)},
 	{text="Hello World  ",font_color=Color.SKY_BLUE},
 	{key='c2',size=Vector2(60,60)},
 	{text="Hell",font_color=Color.SKY_BLUE,font_size=32},
 	],
 	
 	[
-	{text="There is a line ",font_color=Color.PINK,font_size=32},
+	{text="There is a line ",font_color=Color.hex(0xbd757eff),font_size=32},
 	{text="  water  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
 	{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
 	{key='btn1',size=Vector2(64,64)}
@@ -53,7 +53,14 @@ func parse_test2(line:PowerLineEdit):
 	#parse_replace_to(line,'we',{text='HHH'})
 	var btn=Button.new()
 	btn.text='click'
-	parse_replace_to(line,'btn',{key='',size=Vector2.ONE*32,c=btn})
+	btn.size=Vector2(56,56)
+	parse_replace_to(line,'btn',{key='',size=Vector2.ONE*56,c=btn})
+	var text_rect=TextureRect.new()
+	text_rect.texture=preload("res://docs/explanatory_diagram.png")
+	text_rect.stretch_mode=TextureRect.STRETCH_SCALE
+	text_rect.scale=Vector2.ONE*0.5
+	text_rect.size=Vector2.ONE*56
+	parse_replace_to(line,'img',{key='',size=Vector2(128,128),c=text_rect})
 func parse_test(line:PowerLineEdit):
 	for i in line.text_list.size():
 		if(line.is_text(i)):

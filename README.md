@@ -4,6 +4,8 @@ Rich text editor for Godot
 
 ![](./docs/video.gif)
 
+<img src="./docs/show_1.png" alt="img" style="zoom:67%;" />
+
 using  `TextLine` to draw text and `Control` to draw other(such as Image, Button, even a scene!!)
 
 However, there are still many bugs (**not recommended for use in serious projects)**, so it’s better to learn from it, and then fix or extend it.
@@ -17,7 +19,7 @@ However, there are still many bugs (**not recommended for use in serious project
 * save&load content
 * undo&redo
 * start text parser
-* scroll support
+* scroll(follow caret)
 
 #### Finished:
 
@@ -88,7 +90,6 @@ You can use Callable(line:PowerLineEdit) to set `default_parser` in MultilineEdi
 
 * command line
 * code edit
-
 * chat box
 * doc
 
