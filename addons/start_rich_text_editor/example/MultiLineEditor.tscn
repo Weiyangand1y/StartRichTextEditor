@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://u0mvxj2bdulu"]
+[gd_scene load_steps=7 format=3 uid="uid://u0mvxj2bdulu"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
 [ext_resource type="Texture2D" uid="uid://domtnkwrphl7k" path="res://docs/explanatory_diagram.png" id="2_2sidd"]
+[ext_resource type="PackedScene" uid="uid://bgpuuyumbuvju" path="res://addons/start_rich_text_editor/example/text_block_editor.tscn" id="3_igf52"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
 bg_color = Color(0.422747, 0.239652, 0.117217, 1)
@@ -45,6 +46,7 @@ offset_bottom = 586.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_lcex7")
 
 [node name="RichTextEditor" type="Control" parent="ScrollContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("1_lcex7")
 
@@ -57,3 +59,15 @@ offset_right = 674.0
 offset_bottom = 444.0
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_2sidd")
+
+[node name="TextBlockEditor" parent="." instance=ExtResource("3_igf52")]
+layout_mode = 1
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 933.0
+offset_top = 422.0
+offset_right = 933.0
+offset_bottom = 422.0
+grow_horizontal = 1
+grow_vertical = 1

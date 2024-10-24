@@ -13,6 +13,7 @@ var start_posx=0
 @export var default_bg_color:=Color.TRANSPARENT
 @export var selection_color:=Color.WHEAT
 @export var caret_color:=Color.BLACK
+signal caret_change(p:PowerLineEdit)
 var default_parser:Callable
 var data:=[]
 func _ready() -> void:
@@ -54,6 +55,8 @@ func add_line(content=[])->PowerLineEdit:
 		await get_tree().process_frame
 		relayout()
 		)
+	pl.connect("caret_change",func(p):
+		emit_signal("caret_change",p))
 	pl.connect("delete_line_start",func(line:PowerLineEdit):
 		var index=line.get_index() 
 		var pre_line=get_child(index-1) as PowerLineEdit

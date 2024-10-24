@@ -8,6 +8,7 @@ signal text_change(tl:Array[Dictionary])
 signal line_empty(p:PowerLineEdit)
 ## emit when caret at the beginning of the line
 signal delete_line_start(p:PowerLineEdit)
+signal caret_change(p:PowerLineEdit)
 var show_selection:=false
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
@@ -231,6 +232,7 @@ func _input(event: InputEvent) -> void:
 		update_ime_pos()
 		if get_bound().has_point(mpos):
 			edit()
+			emit_signal("caret_change",self)
 			on_select=true
 		elif mpos.y>0 and mpos.y<get_bound().size.y and mpos.x>0:
 			edit()
@@ -282,24 +284,25 @@ func caret_pos_set(mpos):
 			caret_block_index=index
 			if !is_text(caret_block_index):
 				break
-			var text=TextLine.new()
+			tmp_textline.clear()
 			var start_position=rect.position
-			text.add_string(
+			tmp_textline.add_string(
 				text_list[index].text,
 				font,
 				text_list[index].get('font_size',default_font_size)
 				)
-			var h1=text.hit_test(mpos.x-start_position.x)
+			var h1=tmp_textline.hit_test(mpos.x-start_position.x)
 			#print('hit: ',h1)
 			caret_col=h1
-			text.clear()
-			text.add_string(
+			tmp_textline.clear()
+			tmp_textline.add_string(
 				text_list[index].text.substr(0,h1),
 				font,
 				text_list[index].get('font_size',default_font_size)
 				)
-			var w=text.get_line_width()
+			var w=tmp_textline.get_line_width()
 			caret_pos_offsetx=w
+			
 func caret_move_left():
 	caret_col-=1
 	var b=text_list[caret_block_index-1].has('key')

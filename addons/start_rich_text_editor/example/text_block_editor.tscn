@@ -1,0 +1,76 @@
+[gd_scene load_steps=3 format=3 uid="uid://bgpuuyumbuvju"]
+
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/example/text_block_editor.gd" id="1_nfbq6"]
+
+[sub_resource type="Theme" id="Theme_lwll3"]
+default_font_size = 24
+
+[node name="TextBlockEditor" type="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -704.0
+offset_bottom = -424.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_lwll3")
+script = ExtResource("1_nfbq6")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 34.0
+offset_right = 123.0
+offset_bottom = 68.0
+text = "Font Color"
+
+[node name="FontColor" type="ColorPickerButton" parent="."]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 32.0
+offset_right = 192.0
+offset_bottom = 72.0
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 84.0
+offset_right = 124.0
+offset_bottom = 118.0
+text = "Bg Color"
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 3.0
+offset_top = 120.0
+offset_right = 123.0
+offset_bottom = 154.0
+text = "Font size"
+
+[node name="BgColor" type="ColorPickerButton" parent="."]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 80.0
+offset_right = 192.0
+offset_bottom = 120.0
+color = Color(0, 0, 0, 0)
+
+[node name="FontSize" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 130.0
+offset_top = 118.0
+offset_right = 216.0
+offset_bottom = 170.0
+min_value = 8.0
+max_value = 80.0
+value = 8.0
+rounded = true
+tick_count = 10
+ticks_on_borders = true
+
+[node name="SpinBox" type="SpinBox" parent="FontSize"]
+layout_mode = 0
+offset_left = -114.0
+offset_top = 42.0
+offset_right = 4.0
+offset_bottom = 84.0
