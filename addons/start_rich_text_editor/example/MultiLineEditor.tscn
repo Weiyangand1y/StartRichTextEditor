@@ -1,7 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://u0mvxj2bdulu"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
-[ext_resource type="Texture2D" uid="uid://dc1qp7v7jcx00" path="res://addons/start_rich_text_editor/src/icon.svg" id="2_2sidd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
 bg_color = Color(0.422747, 0.239652, 0.117217, 1)
@@ -13,6 +12,22 @@ corner_radius_bottom_left = 12
 [sub_resource type="Theme" id="Theme_q2jcg"]
 Button/styles/normal = SubResource("StyleBoxFlat_d07m2")
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lcex7"]
+content_margin_left = 11.0
+content_margin_top = 11.0
+content_margin_right = 11.0
+content_margin_bottom = 11.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.820034, 0.51602, 0.32017, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
 [node name="UI" type="Control"]
 layout_mode = 3
 anchors_preset = 0
@@ -20,22 +35,14 @@ offset_right = 40.0
 offset_bottom = 40.0
 theme = SubResource("Theme_q2jcg")
 
-[node name="RichTextEditor" type="Control" parent="."]
-anchors_preset = 0
-offset_left = 148.0
-offset_top = 82.0
-offset_right = 970.0
-offset_bottom = 490.0
-script = ExtResource("1_lcex7")
-
-[node name="Control" type="Control" parent="."]
-visible = false
-anchors_preset = 0
-offset_right = 306.0
-offset_bottom = 319.0
-
-[node name="TextureRect" type="TextureRect" parent="Control"]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 0
-offset_right = 32.0
-offset_bottom = 32.0
-texture = ExtResource("2_2sidd")
+offset_left = 147.0
+offset_top = 55.0
+offset_right = 875.0
+offset_bottom = 586.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_lcex7")
+
+[node name="RichTextEditor" type="Control" parent="ScrollContainer"]
+layout_mode = 2
+script = ExtResource("1_lcex7")

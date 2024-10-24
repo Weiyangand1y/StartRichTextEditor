@@ -18,6 +18,7 @@ var text_list:=[
 ]
 var parser:Callable
 #region State Data
+var tmp_textline=TextLine.new()
 # layout state
 var rect_list:Array[Rect2]=[]
 var textline_list:Array[TextLine]=[];
@@ -64,6 +65,7 @@ func start_init():
 		,1.0,0.0,blink_time)
 	tween.set_loops()
 	connect("text_change",func(a):
+		custom_minimum_size.x=get_bound().size.x
 		parse()		
 		)
 func _ready() -> void:
@@ -417,6 +419,7 @@ func back_delete():
 		delete_text()
 	refresh_caret()
 	relayout()
+	emit_signal("text_change",text_list)
 func delete_control_rect():
 	if(text_list[caret_block_index].has('c')):
 		text_list[caret_block_index].c.queue_free()
@@ -457,9 +460,7 @@ func insert(text:String):
 # parser----------------------------------------------------------------
 #region parser
 func parse():
-	if parser:
-		parser.call(self)
-
+	if parser:parser.call(self)
 #endregion
 
 
@@ -489,18 +490,20 @@ func get_bound()->Rect2:
 	return Rect2(start_position.x,start_position.y,next_layout_x-start_position.x,h1+h2)
 
 func get_width(text:String,font_size):
-	var tl=TextLine.new()
-	tl.add_string(text,font,font_size)
-	return tl.get_line_width()
+	tmp_textline.clear()
+	tmp_textline.add_string(text,font,font_size)
+	return tmp_textline.get_line_width()
+## get text width from start to col in block index
 func get_width2():
 	var item=text_list[caret_block_index]
-	if item.has('key'):return 0
+	if item.has('key'):return item.size.x
 	var text=item.text.substr(0,caret_col)
 	var font_size=item.get('font_size',default_font_size)
-	var tl=TextLine.new()
-	tl.add_string(text,font,font_size)
-	return tl.get_line_width()
+	tmp_textline.clear()
+	tmp_textline.add_string(text,font,font_size)
+	return tmp_textline.get_line_width()
 # new a line  -------------------------------------
+#region To new a line
 func get_right():
 	var t1=text_list.slice(caret_block_index)
 	if t1.is_empty(): return []
@@ -522,3 +525,4 @@ func move_right_controls_to(toline:PowerLineEdit):
 		var control_node=item.c as Control
 		remove_child(control_node)
 		toline.add_control(item.key,control_node)
+#endregion

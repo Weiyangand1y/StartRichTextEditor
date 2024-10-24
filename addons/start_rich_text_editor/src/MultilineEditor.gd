@@ -20,6 +20,7 @@ func _ready() -> void:
 	set_data()
 	make_data_into_lines()
 	set_control()
+	relayout()
 func set_control():
 	pass
 func set_data():
@@ -61,6 +62,9 @@ func add_line(content=[])->PowerLineEdit:
 		pre_line.edit()
 		line.move_right_controls_to(pre_line)
 		line.queue_free()
+		relayout()
+		)
+	pl.connect("text_change",func(tl):
 		relayout()
 		)
 	add_child(pl)
@@ -121,11 +125,14 @@ func insert_line():
 
 func relayout():
 	current_layout_y=start_pos.y
+	var max_width=0
 	for line:PowerLineEdit in get_children():
 		line.position=Vector2(start_pos.x,start_pos.y+current_layout_y)
 		var rect=line.get_bound()
 		rect.position+=Vector2(start_pos.x,start_pos.y+current_layout_y)
 		current_layout_y+=rect.size.y
+		max_width=max(max_width,rect.size.x)
+	custom_minimum_size=Vector2(max_width,current_layout_y)
 
 func big_select(from_line,to_line,from_posx,to_posx):
 	if from_line==to_line:
