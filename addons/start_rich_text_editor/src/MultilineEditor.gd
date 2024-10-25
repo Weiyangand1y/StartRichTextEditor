@@ -16,7 +16,10 @@ var max_width=0
 signal caret_change(p:PowerLineEdit)
 var default_parser:Callable
 var data:=[]
+var scroll_container:ScrollContainer
 func _ready() -> void:
+	if get_parent() is ScrollContainer:
+		scroll_container=get_parent()
 	start_pos=Vector2(0,0)
 	current_layout_y=start_pos.y
 	set_data()
@@ -82,9 +85,13 @@ func add_line(content=[])->PowerLineEdit:
 	rect_list.push_back(rect)
 	return pl
 func get_click_line():
+	if scroll_container:
+		if !scroll_container.get_global_rect().has_point(get_global_mouse_position()):
+			return 0
 	var mpos=get_local_mouse_position()
 	for i in rect_list.size():	
-		if rect_list[i].has_point(mpos):
+		var rect= rect_list[i] as Rect2
+		if mpos.x>-1 and mpos.y>rect.position.y and mpos.y<rect.position.y+rect.size.y:
 			return i
 	return 0
 func is_left_pressed(event: InputEvent):
@@ -116,9 +123,11 @@ func _input(event: InputEvent) -> void:
 func insert_line():
 	var current_line=get_child(editing_line) as PowerLineEdit
 	var right=current_line.get_right()
-	
-	var line=add_line()
-	line.text_list=right
+	var line:PowerLineEdit
+	if right.size()==1 and right[0].text=='':
+		line=add_line()
+	else: 
+		line=add_line(right)
 	line.caret_move_start()
 	line.relayout()
 	current_line.move_right_controls_to(line)

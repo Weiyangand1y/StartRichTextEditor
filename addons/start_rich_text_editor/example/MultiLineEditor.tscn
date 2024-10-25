@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://u0mvxj2bdulu"]
+[gd_scene load_steps=8 format=3 uid="uid://u0mvxj2bdulu"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
 [ext_resource type="Texture2D" uid="uid://domtnkwrphl7k" path="res://docs/explanatory_diagram.png" id="2_2sidd"]
@@ -29,6 +29,16 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="GDScript" id="GDScript_igf52"]
+script/source = "extends Label
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		var str=event.as_text()
+		text=str
+		await get_tree().create_timer(1).timeout
+		text=''
+"
 
 [node name="UI" type="Control"]
 layout_mode = 3
@@ -66,8 +76,17 @@ anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
 offset_left = 933.0
-offset_top = 422.0
+offset_top = 128.0
 offset_right = 933.0
-offset_bottom = 422.0
+offset_bottom = 128.0
 grow_horizontal = 1
 grow_vertical = 1
+
+[node name="KeyLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 918.0
+offset_top = 381.0
+offset_right = 1110.0
+offset_bottom = 433.0
+theme_override_font_sizes/font_size = 32
+script = SubResource("GDScript_igf52")

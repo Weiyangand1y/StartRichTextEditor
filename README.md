@@ -4,6 +4,8 @@ Rich text editor for Godot
 
 ![](./docs/video.gif)
 
+![](./docs/video2.gif)
+
 <img src="./docs/show_1.png" alt="img" style="zoom:67%;" />
 
 using  `TextLine` to draw text and `Control` to draw other(such as Image, Button, even a scene!!)

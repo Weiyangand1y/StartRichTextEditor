@@ -227,9 +227,20 @@ func is_left_released(event: InputEvent):
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.is_released():
 		return true
 	return false
+
+func is_in():	
+	if get_parent() is RichTextEditor:
+		var p=get_parent() as RichTextEditor
+		var max_width=get_parent_area_size().x
+		if p.scroll_container:
+			if !(p.scroll_container.get_global_rect().has_point(get_global_mouse_position())):
+				return false
+	return true
+
 func _input(event: InputEvent) -> void:		
 	if(is_left_pressed(event)):
-		var mpos=get_local_mouse_position()
+		if !is_in():return
+		var mpos=get_local_mouse_position()	
 		caret_pos_set(mpos)
 		ssc=caret_col
 		ssi=caret_block_index
@@ -240,7 +251,9 @@ func _input(event: InputEvent) -> void:
 			on_select=true
 		elif mpos.y>0 and mpos.y<get_bound().size.y and mpos.x>0:
 			var is_to_edit=true
+#			when in multiline, caret to end
 			if get_parent() is RichTextEditor:
+				var p=get_parent() as RichTextEditor
 				var max_width=get_parent_area_size().x
 				if mpos.x>max_width:
 					is_to_edit=false

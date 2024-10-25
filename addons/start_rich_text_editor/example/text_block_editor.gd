@@ -32,7 +32,7 @@ func _ready() -> void:
 func update_component(line:PowerLineEdit):
 	var item=line.text_list[line.caret_block_index] as Dictionary
 	if !line.is_text(line.caret_block_index): return
-	$FontColor.color=item.font_color
+	$FontColor.color=item.get('font_color',line.default_font_color)
 	$BgColor.color=item.get('bg_color',line.default_bg_color)
 	editing_line=line
 	editing_index=line.caret_block_index
