@@ -91,3 +91,21 @@ offset_right = 1110.0
 offset_bottom = 433.0
 theme_override_font_sizes/font_size = 32
 script = SubResource("GDScript_igf52")
+
+[node name="SaveButton" type="Button" parent="."]
+layout_mode = 0
+offset_right = 116.0
+offset_bottom = 55.0
+focus_mode = 0
+text = "save"
+
+[node name="LoadButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 122.0
+offset_right = 262.0
+offset_bottom = 54.0
+focus_mode = 0
+text = "load"
+
+[connection signal="pressed" from="SaveButton" to="ScrollContainer/RichTextEditor" method="save_data"]
+[connection signal="pressed" from="LoadButton" to="ScrollContainer/RichTextEditor" method="load_data"]

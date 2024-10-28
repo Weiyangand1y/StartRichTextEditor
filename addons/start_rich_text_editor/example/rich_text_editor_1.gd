@@ -1,26 +1,47 @@
 extends RichTextEditor
+var start_data=[
+	["Hello ",{text="^_^",font_color='#c0d470'},"Hi~"],
+	["-->",{key='',size=[60,60],type='button',prop={text='a button'}}]
+]
+func start_data_parser(p_data:Array):
+	for i in p_data.size():
+		for j in p_data[i].size():
+			var item=p_data[i][j]
+			if item is String:
+				p_data[i][j]={text=item}
+			else:
+				item=item as Dictionary
+				if 'key' in item:
+					var s=Vector2(item.size[0],item.size[1])
+					#var s=JSON.to_native(item.size)
+					p_data[i][j].size=s
+					print(type_string(typeof(p_data[i][j].size)))
+	pass
 func set_data() -> void:
-	data =	[[
-	{text="The sun was setting ",font_color=Color.PINK,bg_color=Color.hex(0xf3f2c0ff),font_size=32},
-	{text="over the rolling hills ",font_color=Color.SKY_BLUE,bg_color=Color.hex(0xcbe0deff),font_size=32},
-	{text="the rolling hills",font_color=Color.SKY_BLUE,bg_color=Color.from_string("#694a87",Color.TRANSPARENT),font_size=32},
-	],
+	#data =	[[
+	#{text="The sun was setting ",font_color='PINK',bg_color='f3f2c0ff',font_size=32},
+	#{text="over the rolling hills ",font_color='SKY_BLUE',bg_color='cbe0deff',font_size=32},
+	#{text="the rolling hills",font_color='SKY_BLUE',bg_color="#694a87",font_size=32},
+	#],
+	#
+	#[
+	#{text="green meadow  ",font_color='8cbfc2ff',font_size=48},
+	#{key='c1',size=Vector2(80,60),type='button',prop={text='.button.',color='#112299'}},
+	#{text="Helloh2World  ",font_color='a4c263ff'},
+	#{text="Hello World  ",font_color='SKY_BLUE'},
+	#{key='c2',size=Vector2(60,60),type='image',prop={path="res://docs/icon.png"}},
+	#{text="Hell",font_color='SKY_BLUE',font_size=32},
+	#],
+	#
+	#[
+	#{text="There is a line ",font_color=Color.hex(0xbd757eff),font_size=32},
+	#{text="  water  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
+	#{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
+	#{key='btn1',size=Vector2(64,64),type='button',prop={text='button',color='#c0d470',bdc='#67835c',fc='#000000'}}
+	#]]
+	start_data_parser(start_data)
+	data.append_array(start_data)
 	
-	[
-	{text="green meadow  ",font_color=Color.hex(0x8cbfc2ff),font_size=48},
-	{key='c1',size=Vector2(80,60),type='button',prop={text='.button.',color='#112299'}},
-	{text="Helloh2World  ",font_color=Color.hex(0xa4c263ff)},
-	{text="Hello World  ",font_color=Color.SKY_BLUE},
-	{key='c2',size=Vector2(60,60),type='image',prop={path="res://docs/icon.png"}},
-	{text="Hell",font_color=Color.SKY_BLUE,font_size=32},
-	],
-	
-	[
-	{text="There is a line ",font_color=Color.hex(0xbd757eff),font_size=32},
-	{text="  water  ",font_color=Color.SKY_BLUE,bg_color=Color.ALICE_BLUE,font_size=32},
-	{text=" grass",font_color=Color.SEA_GREEN,font_size=32},
-	{key='btn1',size=Vector2(64,64),type='button',prop={text='button',color='#c0d470',bdc='#67835c',fc='#000000'}}
-	]]
 	default_parser=parse_test2
 class ControlFactory:
 	static var table={
@@ -63,6 +84,15 @@ func set_control():
 				get_child(index).add_child(control)
 			index2+=1
 		index+=1
+
+func reload():
+	for c in get_children():
+		c.free()
+	set_data()
+	make_data_into_lines()
+	set_control()
+	relayout()
+	pass
 	
 func parse_replace_to(line:PowerLineEdit,str:String,to:Dictionary):
 	for i in line.text_list.size():
@@ -117,3 +147,28 @@ func parse_test(line:PowerLineEdit):
 				line.add_control('ib',btn)
 	line.refresh_caret()
 	line.relayout()
+
+func save_data():
+	var backup_data=data.duplicate(true)
+	for i in backup_data.size():
+		for j in backup_data[i].size():
+			var item=backup_data[i][j]
+			if item.has('key'):
+				item.size=[item.size.x,item.size.y]
+			elif item.has('text'):
+				if item.has('font_color'):
+					item.font_color=(item.font_color as Color).to_html()
+				if item.has('bg_color'):
+					item.bg_color=(item.bg_color as Color).to_html()
+	var f=FileAccess.open('user://text.json',FileAccess.WRITE)
+	f.store_string(JSON.stringify(backup_data,'\t'))
+	f.close()
+	pass
+func load_data():
+	var f=FileAccess.open('user://text.json',FileAccess.READ)
+	var d=JSON.parse_string(f.get_as_text())
+	data=d
+	start_data.clear()
+	start_data_parser(data)
+	reload()
+	pass

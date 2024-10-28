@@ -101,9 +101,10 @@ func get_control_rect(key:String)->Rect2:
 # layout--------------------------------------------------------------
 #region layout
 func pre_layout_control_rect(item:Dictionary):
-	var rect=Rect2(
-		Vector2(next_layout_x,start_position.y),
-		item.size)
+	var pos=Vector2(next_layout_x,start_position.y)
+	
+	var rect_size=Vector2(item.size)
+	var rect=Rect2(pos,rect_size)
 	rect_list.push_back(rect)
 	h1=max(h1,item.size.y)
 	next_layout_x+=item.size.x
@@ -156,7 +157,12 @@ func render():
 		rect.size.y=h1+h2-3
 		rect.position.y=3
 		if(text_list[i].has('text')):
-			draw_rect(rect,text_list[i].get('bg_color',default_bg_color))
+			var color
+			if text_list[i].get('bg_color','') is Color:
+				color=text_list[i].bg_color
+			else:
+				color=Color.from_string(text_list[i].get('bg_color',''),default_bg_color)
+			draw_rect(rect,color)
 	# draw selection
 	if show_selection:
 		for r in rl:
@@ -165,10 +171,15 @@ func render():
 	for tl:TextLine in textline_list:
 		var rect=rect_list[index] as Rect2
 		if(text_list[index].has('text')):
+			var color
+			if text_list[index].get('font_color','') is Color:
+				color=text_list[index].font_color
+			else:
+				color=Color.from_string(text_list[index].get('font_color',''),default_font_color)
 			tl.draw(
 				get_canvas_item(),
 				rect.position,
-				text_list[index].get('font_color',default_font_color))
+				color)
 		index+=1
 	pass
 func _draw() -> void:
