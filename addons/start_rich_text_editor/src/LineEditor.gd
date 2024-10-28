@@ -571,3 +571,6 @@ func split_text_block():
 	text_list.insert(caret_block_index,item1)
 	text_list.insert(caret_block_index+1,item2)
 	relayout()
+
+
+#Control-----

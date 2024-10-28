@@ -76,11 +76,50 @@ Control Block:
 }
 ```
 
-A code example is in res://addons/start_rich_text_editor/example/rich_text_editor_1.gd
+A code example is in res://addons/start_rich_text_editor/example/rich_text_editor_1.gd(it is very useful~)
 
 #### Add Control
 
 You can use `add_control` or set 'c' in dict, and then add_child
+
+To make [create and attach control] easier, you can make Factory to create control and set their prop, like that:
+
+```lua
+{key='btn1',size=Vector2(64,64),
+type='button',
+prop={
+	text='button',
+	color='#c0d470',
+	bdc='#67835c',
+	fc='#000000'
+}}
+```
+
+
+```python
+class ControlFactory:
+	static var table={
+		button=ButtonFactory,
+		image=ImageFactory
+		}
+	static func create(type:String,props:Dictionary)->Control:
+		return table[type].create(props)
+	
+	class ButtonFactory:
+		static func create(props:Dictionary):
+			var btn=Button.new()
+			btn.text=props.get('text','')
+			if props.has('color'):
+				var stylebox=StyleBoxFlat.new()
+				stylebox.bg_color=Color.from_string(props.color,Color.NAVAJO_WHITE)
+				stylebox.set_corner_radius_all(12)
+				stylebox.set_border_width_all(1)
+				stylebox.border_color=Color.from_string(props.get('bdc',''),Color.NAVAJO_WHITE)
+				btn.add_theme_color_override('font_color',Color.from_string(props.get('fc',''),Color.NAVAJO_WHITE))
+				btn.add_theme_stylebox_override('normal',stylebox)
+			return btn
+```
+
 
 #### Add parser
 

@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://u0mvxj2bdulu"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/rich_text_editor_1.gd" id="1_lcex7"]
-[ext_resource type="Texture2D" uid="uid://domtnkwrphl7k" path="res://docs/explanatory_diagram.png" id="2_2sidd"]
+[ext_resource type="Texture2D" uid="uid://b7gt6leerx425" path="res://docs/icon.png" id="2_igf52"]
 [ext_resource type="PackedScene" uid="uid://bgpuuyumbuvju" path="res://addons/start_rich_text_editor/example/text_block_editor.tscn" id="3_igf52"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
@@ -65,10 +65,11 @@ visible = false
 layout_mode = 0
 offset_left = 418.0
 offset_top = 188.0
-offset_right = 674.0
-offset_bottom = 444.0
+offset_right = 652.0
+offset_bottom = 374.0
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("2_2sidd")
+texture = ExtResource("2_igf52")
+expand_mode = 1
 
 [node name="TextBlockEditor" parent="." instance=ExtResource("3_igf52")]
 layout_mode = 1
