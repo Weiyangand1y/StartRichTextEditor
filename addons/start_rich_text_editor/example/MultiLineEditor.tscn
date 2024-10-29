@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bgpuuyumbuvju" path="res://addons/start_rich_text_editor/example/text_block_editor.tscn" id="3_igf52"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d07m2"]
-bg_color = Color(0.422747, 0.239652, 0.117217, 1)
+bg_color = Color(0.600648, 0.353015, 0.188557, 1)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12

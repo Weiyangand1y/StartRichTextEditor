@@ -494,7 +494,9 @@ func delete_text():
 #insert---------------------------------------------------------
 #region insert text
 func insert(text:String):
+	if !is_text(caret_block_index):return
 	var item=text_list[caret_block_index]
+	
 	var t:String=item.text
 	t=t.insert(caret_col,text)
 	caret_col+=text.length()
@@ -545,6 +547,14 @@ func get_width2():
 	tmp_textline.clear()
 	tmp_textline.add_string(text,font,font_size)
 	return tmp_textline.get_line_width()
+func control_to_block_index(control_index):
+	var i=-1
+	for j in text_list.size():
+		if text_list[j].has('key'):
+			i+=1
+			if i==control_index:
+				return j
+	return -1
 # new a line  -------------------------------------
 #region To new a line
 func get_right():

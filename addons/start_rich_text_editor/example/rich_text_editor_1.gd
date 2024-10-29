@@ -1,7 +1,9 @@
 extends RichTextEditor
+signal control_clicked
 var start_data=[
 	["Hello ",{text="^_^",font_color='#c0d470'},"Hi~"],
-	["-->",{key='',size=[60,60],type='button',prop={text='a button'}}]
+	["-->",{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}}],
+	[{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}},"----"]
 ]
 func start_data_parser(p_data:Array):
 	for i in p_data.size():
@@ -49,7 +51,16 @@ class ControlFactory:
 		image=ImageFactory
 		}
 	static func create(type:String,props:Dictionary)->Control:
-		return table[type].create(props)
+		var control=table[type].create(props) as Control
+		control.connect("gui_input",func(event:InputEvent):
+			if  event is  InputEventMouseButton:
+				event=event as InputEventMouseButton
+				if event.is_pressed() and event.button_index==MOUSE_BUTTON_LEFT:
+					var line_index=control.get_parent().get_index()
+					var block_index=control.get_index()
+					control.get_parent().get_parent().emit_signal("control_clicked",line_index,block_index)
+			)
+		return control
 		
 	class ButtonFactory:
 		static func create(props:Dictionary):
@@ -114,6 +125,7 @@ func parse_replace_to(line:PowerLineEdit,str:String,to:Dictionary):
 					line.add_child(to.c)
 	line.refresh_caret()
 	line.relayout()
+	line.get_parent().relayout()
 func parse_test2(line:PowerLineEdit):
 	#parse_replace_to(line,'we',{text='HHH'})
 	var btn=Button.new()
@@ -149,7 +161,10 @@ func parse_test(line:PowerLineEdit):
 	line.relayout()
 
 func save_data():
-	var backup_data=data.duplicate(true)
+	var backup_data=[]
+	#var backup_data=data.duplicate(true)
+	for c:PowerLineEdit in get_children():
+		backup_data.push_back(c.text_list.duplicate())
 	for i in backup_data.size():
 		for j in backup_data[i].size():
 			var item=backup_data[i][j]
@@ -160,6 +175,8 @@ func save_data():
 					item.font_color=(item.font_color as Color).to_html()
 				if item.has('bg_color'):
 					item.bg_color=(item.bg_color as Color).to_html()
+				if item.has('c'):
+					item.erase('c')
 	var f=FileAccess.open('user://text.json',FileAccess.WRITE)
 	f.store_string(JSON.stringify(backup_data,'\t'))
 	f.close()

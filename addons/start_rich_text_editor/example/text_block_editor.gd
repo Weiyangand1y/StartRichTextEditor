@@ -3,6 +3,7 @@ var editing_line:PowerLineEdit
 var editing_index=0
 func _ready() -> void:
 	%RichTextEditor.connect("caret_change",update_component)
+	%RichTextEditor.connect("control_clicked",update_inspector)
 	$FontColor.connect("color_changed",func(new_color:Color):
 		var item=editing_line.text_list[editing_index] as Dictionary
 		editing_line.text_list[editing_index].font_color=new_color
@@ -38,4 +39,8 @@ func update_component(line:PowerLineEdit):
 	editing_index=line.caret_block_index
 	$FontSize/SpinBox.value=item.get('font_size',line.default_font_size)
 	$FontSize.value=item.get('font_size',line.default_font_size)
+	pass
+
+func update_inspector(line_index,control_index):
+	$Inspector.show_inspector(%RichTextEditor,line_index,control_index)
 	pass
