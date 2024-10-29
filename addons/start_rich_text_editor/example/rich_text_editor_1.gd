@@ -3,7 +3,8 @@ signal control_clicked
 var start_data=[
 	["Hello ",{text="^_^",font_color='#c0d470'},"Hi~"],
 	["-->",{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}}],
-	[{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}},"----"]
+	[{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}},"----"],
+	["----",{key='',size=Vector2.ONE*128,type='image',prop={path="res://docs/explanatory diagram.svg"}},"------"]
 ]
 func start_data_parser(p_data:Array):
 	for i in p_data.size():
@@ -17,7 +18,7 @@ func start_data_parser(p_data:Array):
 					var s=Vector2(item.size[0],item.size[1])
 					#var s=JSON.to_native(item.size)
 					p_data[i][j].size=s
-					print(type_string(typeof(p_data[i][j].size)))
+					#print(type_string(typeof(p_data[i][j].size)))
 	pass
 func set_data() -> void:
 	#data =	[[
@@ -78,7 +79,10 @@ class ControlFactory:
 	class ImageFactory:
 		static func create(props:Dictionary):
 			var texture_rect=TextureRect.new()
-			texture_rect.texture=load(props.path)
+			var texture:Texture2D
+			var path=props.path as String
+			texture=ImageTexture.create_from_image(Image.load_from_file(path)) 
+			texture_rect.texture=texture
 			texture_rect.stretch_mode=TextureRect.STRETCH_SCALE
 			texture_rect.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
 			return texture_rect
@@ -164,7 +168,7 @@ func save_data():
 	var backup_data=[]
 	#var backup_data=data.duplicate(true)
 	for c:PowerLineEdit in get_children():
-		backup_data.push_back(c.text_list.duplicate())
+		backup_data.push_back(c.text_list.duplicate(true))
 	for i in backup_data.size():
 		for j in backup_data[i].size():
 			var item=backup_data[i][j]

@@ -1,0 +1,93 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2samvg6mi6xt"]
+
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/example/image_inspector.gd" id="1_ocain"]
+
+[node name="Image" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 440.0
+offset_bottom = 248.0
+script = ExtResource("1_ocain")
+
+[node name="Path" type="Label" parent="."]
+layout_mode = 0
+offset_top = 8.0
+offset_right = 60.0
+offset_bottom = 42.0
+text = "path:"
+
+[node name="LineEdit" type="LineEdit" parent="Path"]
+layout_mode = 0
+offset_left = 64.0
+offset_right = 256.0
+offset_bottom = 48.0
+
+[node name="Button" type="Button" parent="Path"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 48.0
+offset_bottom = 48.0
+tooltip_text = "open image in explore windows"
+
+[node name="Size" type="Label" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 72.0
+offset_right = 48.0
+offset_bottom = 95.0
+text = "size"
+
+[node name="X" type="Label" parent="Size"]
+layout_mode = 0
+offset_left = 48.0
+offset_right = 57.0
+offset_bottom = 23.0
+text = "x"
+
+[node name="SpinBox" type="SpinBox" parent="Size/X"]
+layout_mode = 0
+offset_left = 16.0
+offset_right = 103.0
+offset_bottom = 31.0
+min_value = 32.0
+max_value = 512.0
+value = 32.0
+
+[node name="Y" type="Label" parent="Size"]
+layout_mode = 0
+offset_left = 152.0
+offset_right = 176.0
+offset_bottom = 23.0
+text = "y"
+
+[node name="SpinBox" type="SpinBox" parent="Size/Y"]
+layout_mode = 0
+offset_left = 16.0
+offset_right = 103.0
+offset_bottom = 31.0
+min_value = 32.0
+max_value = 512.0
+value = 32.0
+
+[node name="Scale" type="Label" parent="Size"]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 40.0
+offset_bottom = 63.0
+text = "scale"
+
+[node name="SpinBox" type="SpinBox" parent="Size/Scale"]
+layout_mode = 0
+offset_left = 48.0
+offset_right = 134.562
+offset_bottom = 31.0
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+use_native_dialog = true
+
+[connection signal="text_submitted" from="Path/LineEdit" to="." method="on_path_submit"]

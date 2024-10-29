@@ -49,10 +49,10 @@ theme = SubResource("Theme_q2jcg")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 0
-offset_left = 147.0
-offset_top = 55.0
-offset_right = 875.0
-offset_bottom = 586.0
+offset_left = 75.0
+offset_top = 71.0
+offset_right = 803.0
+offset_bottom = 602.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_lcex7")
 
 [node name="RichTextEditor" type="Control" parent="ScrollContainer"]
@@ -76,10 +76,10 @@ layout_mode = 1
 anchors_preset = 0
 anchor_right = 0.0
 anchor_bottom = 0.0
-offset_left = 933.0
-offset_top = 128.0
-offset_right = 933.0
-offset_bottom = 128.0
+offset_left = 836.0
+offset_top = 136.0
+offset_right = 836.0
+offset_bottom = 136.0
 grow_horizontal = 1
 grow_vertical = 1
 

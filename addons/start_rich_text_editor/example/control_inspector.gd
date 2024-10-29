@@ -1,7 +1,10 @@
 extends Control
 
 class InspectorFactory:
-	static var table={button=ButtonFactory}
+	static var table={
+		button=ButtonFactory,
+		image=ImageFactory
+		}
 	static func create(item):
 		return table[item.type].create(item)
 		pass
@@ -17,13 +20,22 @@ class InspectorFactory:
 				)
 			container.add_child(color_picker1)
 			return container
+	class ImageFactory:
+		static func create(item:Dictionary):
+			var container=VBoxContainer.new()
+			var line_edit=LineEdit.new()
+			return container
+			pass
 func show_inspector(rich_text_editor,i,j):
-	clear()
+	#clear()
 	var line=rich_text_editor.get_child(i) as PowerLineEdit
 	var block_index=line.control_to_block_index(j)
 	var item=line.text_list[block_index]
-	print(item)
-	add_child(InspectorFactory.create(item))
+	#print(item)
+	#add_child(InspectorFactory.create(item))
+	if item.type=='image':
+		$Image.show()
+		$Image.editting_image_block=item
 	pass
 func clear():
 	for c in get_children():

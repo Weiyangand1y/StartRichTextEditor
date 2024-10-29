@@ -18,10 +18,11 @@ However, there are still many bugs (**not recommended for use in serious project
 * good copy&paste
 * perfect caret move
 * enough config
-* save&load content
 * undo&redo
-* start text parser
 * scroll(follow caret)
+* easy plugin system
+* easy interface
+* clean code
 
 #### Finished:
 
@@ -30,6 +31,7 @@ However, there are still many bugs (**not recommended for use in serious project
 * simple copy&paste
 * ime input support
 * parse text
+* simple inspector
 
 ### Usage
 
@@ -95,7 +97,6 @@ prop={
 }}
 ```
 
-
 ```python
 class ControlFactory:
 	static var table={
@@ -104,7 +105,7 @@ class ControlFactory:
 		}
 	static func create(type:String,props:Dictionary)->Control:
 		return table[type].create(props)
-	
+
 	class ButtonFactory:
 		static func create(props:Dictionary):
 			var btn=Button.new()
@@ -119,7 +120,6 @@ class ControlFactory:
 				btn.add_theme_stylebox_override('normal',stylebox)
 			return btn
 ```
-
 
 #### Add parser
 
