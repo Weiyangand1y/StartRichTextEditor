@@ -1,22 +1,27 @@
 @icon("res://addons/start_rich_text_editor/src/icon.svg")
 class_name RichTextEditor extends Control
+# layout
 var current_layout_y=0
 var start_pos:Vector2
 var rect_list:Array[Rect2]=[]
+var start_posx=0
+var max_width=0
+# select
 var editing_line=0
 var selecting=false
 var start_line=0
-var start_posx=0
-var max_width=0
+# setting
 @export var default_font_color:=Color.BLACK
 @export var default_font_size:=32
 @export var default_bg_color:=Color.TRANSPARENT
 @export var selection_color:=Color.WHEAT
 @export var caret_color:=Color.BLACK
 signal caret_change(p:PowerLineEdit)
+# data
 var default_parser:Callable
 var data:=[]
 var scroll_container:ScrollContainer
+
 func _ready() -> void:
 	if get_parent() is ScrollContainer:
 		scroll_container=get_parent()
@@ -84,7 +89,8 @@ func add_line(content=[])->PowerLineEdit:
 	current_layout_y+=rect.size.y
 	rect_list.push_back(rect)
 	return pl
-func get_click_line():
+	
+func get_click_line()->int:
 	if scroll_container:
 		if !scroll_container.get_global_rect().has_point(get_global_mouse_position()):
 			return 0
@@ -94,6 +100,8 @@ func get_click_line():
 		if mpos.x>-1 and mpos.y>rect.position.y and mpos.y<rect.position.y+rect.size.y:
 			return i
 	return 0
+# input
+#region input
 func is_left_pressed(event: InputEvent):
 	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and event.is_pressed():
 		return true
@@ -119,6 +127,8 @@ func _input(event: InputEvent) -> void:
 		move_down()
 	if event.is_action_pressed("ui_up"):
 		move_up()
+#endregion
+
 # when 'Enter' pressed
 func insert_line():
 	var current_line=get_child(editing_line) as PowerLineEdit
@@ -134,12 +144,9 @@ func insert_line():
 	current_line.remove_right()
 	current_line.unedit()
 	
-	
 	move_child(line,editing_line+1)
-	
 	line.relayout()
 	relayout()
-	pass
 
 func relayout():
 	rect_list.clear()
@@ -154,6 +161,9 @@ func relayout():
 		rect_list.push_back(rect)
 	custom_minimum_size=Vector2(max_width,current_layout_y)
 
+	# first_line |     |<-_|
+	# other_line |_________|
+	# last_line  |_->|     |
 func big_select(from_line,to_line,from_posx,to_posx):
 	if from_line==to_line:
 		return
@@ -165,32 +175,31 @@ func big_select(from_line,to_line,from_posx,to_posx):
 	for i in range(from_line+1,to_line):
 		var line=get_child(i) as PowerLineEdit
 		line.select_all()
-	var fl=get_child(from_line) as PowerLineEdit
-	var el=get_child(to_line) as PowerLineEdit
-
-	fl.show_selection=true
-	fl.select_to_right(from_posx)
-	el.show_selection=true
-	el.select_to_left(to_posx)	
-	pass
+	get_line(from_line).select_to_right(from_posx)
+	get_line(to_line).select_to_left(to_posx)	
+	
 func move_up():
-	selecting=false
-	if editing_line==0:return
-	var oline=get_child(editing_line) as PowerLineEdit
+	if editing_line==0:return   # at the first line
+	var oline=get_editting_line()
 	var posx=oline.get_caret_posx()
 	oline.unedit()
 	editing_line-=1
-	var line=get_child(editing_line) as PowerLineEdit
+	var line=get_editting_line()
 	line.caret_pos_set(Vector2(posx,32))
 	line.edit()
-	pass
+
 func move_down():
-	if editing_line==get_children().size()-1:return
-	var oline=get_child(editing_line) as PowerLineEdit
+	if editing_line==get_child_count()-1:return   # at the first line
+	var oline=get_editting_line()
 	var posx=oline.get_caret_posx()
 	oline.unedit()
 	editing_line+=1
-	var line=get_child(editing_line) as PowerLineEdit
+	var line=get_editting_line()
 	line.caret_pos_set(Vector2(posx,32))
 	line.edit()
-	pass
+
+# wrapped get
+func get_editting_line()->PowerLineEdit:
+	return get_child(editing_line) as PowerLineEdit
+func get_line(line_num:int)->PowerLineEdit:
+	return get_child(line_num) as PowerLineEdit

@@ -149,6 +149,13 @@ func relayout():
 #endregion
 # render--------------------------------------------------------------
 #region render
+func get_color(block_index,key,default_color):
+	var color
+	if text_list[block_index].get(key,'') is Color:
+		color=text_list[block_index][key]
+	else:
+		color=Color.from_string(text_list[block_index].get(key,''),default_color)
+	return color
 func render():
 	var index=0
 	# draw bg
@@ -157,11 +164,7 @@ func render():
 		rect.size.y=h1+h2-3
 		rect.position.y=3
 		if(text_list[i].has('text')):
-			var color
-			if text_list[i].get('bg_color','') is Color:
-				color=text_list[i].bg_color
-			else:
-				color=Color.from_string(text_list[i].get('bg_color',''),default_bg_color)
+			var color=get_color(i,'bg_color',Color.TRANSPARENT)
 			draw_rect(rect,color)
 	# draw selection
 	if show_selection:
@@ -171,17 +174,10 @@ func render():
 	for tl:TextLine in textline_list:
 		var rect=rect_list[index] as Rect2
 		if(text_list[index].has('text')):
-			var color
-			if text_list[index].get('font_color','') is Color:
-				color=text_list[index].font_color
-			else:
-				color=Color.from_string(text_list[index].get('font_color',''),default_font_color)
-			tl.draw(
-				get_canvas_item(),
-				rect.position,
-				color)
+			var color=get_color(index,'font_color',Color.BLACK)
+			tl.draw(get_canvas_item(),rect.position,color)
 		index+=1
-	pass
+	
 func _draw() -> void:
 	render()
 	if editing:draw_caret()
@@ -193,14 +189,16 @@ func _draw() -> void:
 func _process(delta: float) -> void:
 	queue_redraw()
 func refresh_caret():
-	caret_pos_offsetx=get_width2()
+	caret_pos_offsetx=get_width_left_half()
 func update_ime_pos():
-	DisplayServer.window_set_ime_position(
-		global_position
-		+rect_list[caret_block_index].position
-		+caret_pos_offsetx*Vector2.RIGHT
-		+get_bound().size.y*2*Vector2.DOWN
-		)
+	var rect=rect_list[caret_block_index] as Rect2
+	var pos=global_position\
+		+rect.position\
+		+caret_pos_offsetx*Vector2.RIGHT\
+		+rect.size.y*Vector2.DOWN
+	
+	DisplayServer.window_set_ime_position(pos)
+	
 func draw_caret():
 	var rect=rect_list[caret_block_index]
 	var caret_pos=rect.position+Vector2.RIGHT*caret_pos_offsetx
@@ -210,7 +208,7 @@ func draw_caret():
 		caret_pos,
 		caret_pos+rect.size.y*Vector2.DOWN,
 		color,2)
-	pass
+	
 #endregion
 
 # edit enter & out ------------------------------------------------------
@@ -239,6 +237,7 @@ func is_left_released(event: InputEvent):
 		return true
 	return false
 
+# check if in big area(scroll container or Editor without scroll container
 func is_in():	
 	if get_parent() is RichTextEditor:
 		var p=get_parent() as RichTextEditor
@@ -247,33 +246,39 @@ func is_in():
 			if !(p.scroll_container.get_global_rect().has_point(get_global_mouse_position())):
 				return false
 	return true
+func _click_in_bound():
+	edit()
+	emit_signal("caret_change",self)
+	on_select=true
+	
+func _click_in_line_end():
+	var mpos=get_local_mouse_position()	
+	var is_to_edit=true
+#	when in multiline, caret to end
+	if get_parent() is RichTextEditor:
+		var p=get_parent() as RichTextEditor
+		var max_width=get_parent_area_size().x
+		if mpos.x>max_width:
+			is_to_edit=false
+	if is_to_edit:
+		edit()
+		emit_signal("caret_change",self)
+		caret_move_end()
+	on_select=true
 
 func _input(event: InputEvent) -> void:		
 	if(is_left_pressed(event)):
 		if !is_in():return
 		var mpos=get_local_mouse_position()	
 		caret_pos_set(mpos)
+		# set select start index and col
 		ssc=caret_col
 		ssi=caret_block_index
-		update_ime_pos()
 		if get_bound().has_point(mpos):
-			edit()
-			emit_signal("caret_change",self)
-			on_select=true
+			_click_in_bound()
 		elif mpos.y>0 and mpos.y<get_bound().size.y and mpos.x>0:
-			var is_to_edit=true
-#			when in multiline, caret to end
-			if get_parent() is RichTextEditor:
-				var p=get_parent() as RichTextEditor
-				var max_width=get_parent_area_size().x
-				if mpos.x>max_width:
-					is_to_edit=false
-			if is_to_edit:
-				edit()
-				caret_move_end()
-			on_select=true
+			_click_in_line_end()
 		else: unedit()
-		queue_redraw()
 	# ---------------------------------------------
 	# If not editing, NOT Go Down!!!!
 	if !editing:return
@@ -281,30 +286,33 @@ func _input(event: InputEvent) -> void:
 		if on_select:
 			caret_pos_set(get_local_mouse_position())
 			select(ssi,caret_block_index,ssc,caret_col)
-			queue_redraw()
-		pass
+	# release to end drag select
 	if is_left_released(event):
 		on_select=false
-	
+	# input
+	# (-)backspace delete
 	if(event.is_action_pressed("ui_text_backspace")):
 		back_delete()
+	# (+)input character
 	if(event is InputEventKey):
 		var uc=event.unicode
 		if(uc>256 or (uc>=32 and uc<=126)):
 			var s=String.chr(uc)
 			insert(s)
+	# caret move
 	if(event.is_action_pressed("ui_left")):
 		caret_move_left()
-	if(event.is_action_pressed("ui_right")):
+	elif(event.is_action_pressed("ui_right")):
 		caret_move_right()
-	if(event.is_action_pressed("ui_paste")):
+	elif(event.is_action_pressed("ui_paste")):
 		insert(DisplayServer.clipboard_get())
-	if(event.is_action_pressed("ui_copy")):
+	elif(event.is_action_pressed("ui_copy")):
 		simple_copy()
-	if(event.is_action_pressed("ui_end")):
+	elif(event.is_action_pressed("ui_end")):
 		caret_move_end()
-	if(event.is_action_pressed("ui_home")):
+	elif(event.is_action_pressed("ui_home")):
 		caret_move_start()
+	# cut text block
 	if(event is InputEventKey):
 		event=event as InputEventKey
 		if event.alt_pressed and event.keycode==KEY_D:
@@ -318,28 +326,29 @@ func caret_pos_set(mpos):
 		return
 	for index in rect_list.size():
 		var rect=rect_list[index] as Rect2
-		if mpos.x>rect.position.x and mpos.x<rect.position.x+rect.size.x:
-			caret_block_index=index
-			if !is_text(caret_block_index):
-				break
-			tmp_textline.clear()
-			var start_position=rect.position
-			tmp_textline.add_string(
-				text_list[index].text,
-				font,
-				text_list[index].get('font_size',default_font_size)
-				)
-			var h1=tmp_textline.hit_test(mpos.x-start_position.x)
-			#print('hit: ',h1)
-			caret_col=h1
-			tmp_textline.clear()
-			tmp_textline.add_string(
-				text_list[index].text.substr(0,h1),
-				font,
-				text_list[index].get('font_size',default_font_size)
-				)
-			var w=tmp_textline.get_line_width()
-			caret_pos_offsetx=w
+		var btw_rect=mpos.x>rect.position.x and mpos.x<rect.position.x+rect.size.x
+		if !btw_rect:continue
+		caret_block_index=index
+		if !is_text(caret_block_index):
+			break
+		tmp_textline.clear()
+		var start_position=rect.position
+		tmp_textline.add_string(
+			text_list[index].text,
+			font,
+			text_list[index].get('font_size',default_font_size)
+			)
+		var h1=tmp_textline.hit_test(mpos.x-start_position.x)
+		#print('hit: ',h1)
+		caret_col=h1
+		tmp_textline.clear()
+		tmp_textline.add_string(
+			text_list[index].text.substr(0,h1),
+			font,
+			text_list[index].get('font_size',default_font_size)
+			)
+		var w=tmp_textline.get_line_width()
+		caret_pos_offsetx=w
 			
 func caret_move_left():
 	caret_col-=1
@@ -402,47 +411,45 @@ func select(from,to,f2,t2):
 	# the first and last
 	var i1=text_list[from]
 	var i2=text_list[to]
-	if(i1.has('text')):
+	if(is_text(from)):
 		var w1=get_width(i1.text.substr(0,f2),i1.get('font_size',default_font_size))
 		rl[0].position.x+=w1
 		rl[0].size.x-=w1
-	if(i2.has('text')):
+	if(is_text(to)):
 		var w1=get_width(i2.text.substr(t2),i2.get('font_size',default_font_size))
 		rl[-1].size.x-=w1	
-	pass
-	
+func select_from_state():
+	select(
+		select_start_index,  select_end_index,
+		select_start_col,    select_end_col)
 func select_all():
 	show_selection=true
 	select_start_index=0
 	select_start_col=0
 	select_end_index=text_list.size()-1
-	select_end_col=text_list[select_end_index].text.length()
-	select(
-		select_start_index,  select_end_index,
-		select_start_col,    select_end_col)
-	pass
+	if is_text(select_end_index):
+		select_end_col=text_list[select_end_index].text.length()
+	select_from_state()
 func select_to_left(posx):
+	show_selection=true
 	caret_pos_set(Vector2(posx,40))
 	if !is_text(caret_block_index):
 		return
 	select_start_index=0
 	select_start_col=0
 	select_end_index=caret_block_index
-	select_end_col=caret_col
-	
-	select(select_start_index, select_end_index,      
-			select_start_col,select_end_col)
+	select_end_col=caret_col	
+	select_from_state()
 	pass
 func select_to_right(posx):
-	#print(posx)
+	show_selection=true
 	caret_pos_set(Vector2(posx,40))
 	select_start_index=caret_block_index
 	#print(caret_block_index)
 	select_start_col=caret_col
 	select_end_index=textline_list.size()-1
 	select_end_col=text_list[select_end_index].text.length()	
-	select(select_start_index, select_end_index,           
-			select_start_col, select_end_col)
+	select_from_state()
 #endregion
 #delete--------------------------------------------------------
 #region delete
@@ -539,14 +546,22 @@ func get_width(text:String,font_size):
 	tmp_textline.add_string(text,font,font_size)
 	return tmp_textline.get_line_width()
 ## get text width from start to col in block index
-func get_width2():
+func get_width_left_half(col=-1):
+	if col==-1:col=caret_col
 	var item=text_list[caret_block_index]
 	if item.has('key'):return item.size.x
-	var text=item.text.substr(0,caret_col)
+	var text=item.text.substr(0,col)
 	var font_size=item.get('font_size',default_font_size)
-	tmp_textline.clear()
-	tmp_textline.add_string(text,font,font_size)
-	return tmp_textline.get_line_width()
+	return get_width(text,font_size)
+
+func get_width_right_half(col=-1):
+	if col==-1:col=caret_col
+	var item=text_list[caret_block_index]
+	if item.has('key'):return item.size.x
+	var text=item.text.substr(col)
+	var font_size=item.get('font_size',default_font_size)
+	return get_width(text,font_size)
+
 func control_to_block_index(control_index):
 	var i=-1
 	for j in text_list.size():
@@ -592,6 +607,4 @@ func split_text_block():
 	text_list.insert(caret_block_index,item1)
 	text_list.insert(caret_block_index+1,item2)
 	relayout()
-
-
 #Control-----
