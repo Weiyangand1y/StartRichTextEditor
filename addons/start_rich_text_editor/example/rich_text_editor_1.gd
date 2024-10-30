@@ -2,8 +2,8 @@ extends RichTextEditor
 signal control_clicked
 var start_data=[
 	["Hello ",{text="^_^",font_color='#c0d470'},"Hi~"],
-	["-->",{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}}],
-	[{key='',size=[60,60],type='button',prop={text='a button',color='pink',fc='black'}},"----"],
+	["-->",{key='',size=[68,68],type='button',prop={text='a button',color='pink',fc='black'}}],
+	[{key='',size=[68,68],type='button',prop={text='a button',color='pink',fc='black'}},"----"],
 	["----",{key='',size=Vector2.ONE*128,type='image',prop={path="res://docs/explanatory diagram.svg"}},"------"]
 ]
 func start_data_parser(p_data:Array):
@@ -81,7 +81,10 @@ class ControlFactory:
 			var texture_rect=TextureRect.new()
 			var texture:Texture2D
 			var path=props.path as String
-			texture=ImageTexture.create_from_image(Image.load_from_file(path)) 
+			if path.begins_with("res://"):
+				texture=load(path)
+			else:	
+				texture=ImageTexture.create_from_image(Image.load_from_file(path)) 
 			texture_rect.texture=texture
 			texture_rect.stretch_mode=TextureRect.STRETCH_SCALE
 			texture_rect.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
@@ -136,12 +139,11 @@ func parse_test2(line:PowerLineEdit):
 	btn.text='click'
 	btn.size=Vector2(56,56)
 	parse_replace_to(line,'btn',{key='',size=Vector2.ONE*56,c=btn})
-	var text_rect=TextureRect.new()
-	text_rect.texture=preload("res://docs/explanatory_diagram.png")
-	text_rect.stretch_mode=TextureRect.STRETCH_SCALE
-	text_rect.scale=Vector2.ONE*0.5
-	text_rect.size=Vector2.ONE*56
-	parse_replace_to(line,'img',{key='',size=Vector2(128,128),c=text_rect})
+	var image=ControlFactory.create('image',{
+		path="res://docs/explanatory diagram.svg",				
+	})
+	image.size=Vector2(56,56)
+	parse_replace_to(line,'img',{key='',type='image',prop={},size=Vector2(128,128),c=image})
 func parse_test(line:PowerLineEdit):
 	for i in line.text_list.size():
 		if(line.is_text(i)):
@@ -155,12 +157,11 @@ func parse_test(line:PowerLineEdit):
 				line.text_list.insert(i+1,{
 					text=splits[1],font_size=32
 				})
-				var btn=TextureRect.new()
-				btn.texture=preload("res://addons/start_rich_text_editor/src/icon.svg")			
-				btn.stretch_mode=TextureRect.STRETCH_SCALE
-				btn.size=Vector2.ONE*64
+				var image=ControlFactory.create('image',{
+					path="res://docs/explanatory diagram.svg",				
+				})
 				line.relayout()
-				line.add_control('ib',btn)
+				line.add_control('ib',image)
 	line.refresh_caret()
 	line.relayout()
 
@@ -174,6 +175,11 @@ func save_data():
 			var item=backup_data[i][j]
 			if item.has('key'):
 				item.size=[item.size.x,item.size.y]
+				item.erase('c')
+				for key in item.prop:
+					if item.prop[key] is Color:
+						var c=item.prop[key] as Color
+						item.prop[key]=c.to_html()
 			elif item.has('text'):
 				if item.has('font_color'):
 					item.font_color=(item.font_color as Color).to_html()

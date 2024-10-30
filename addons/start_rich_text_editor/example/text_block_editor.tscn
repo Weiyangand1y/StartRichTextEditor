@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://bgpuuyumbuvju"]
+[gd_scene load_steps=6 format=3 uid="uid://bgpuuyumbuvju"]
 
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/text_block_editor.gd" id="1_nfbq6"]
 [ext_resource type="Script" path="res://addons/start_rich_text_editor/example/control_inspector.gd" id="2_21q88"]
 [ext_resource type="PackedScene" uid="uid://d2samvg6mi6xt" path="res://addons/start_rich_text_editor/example/image_inspector.tscn" id="3_7cvbf"]
+[ext_resource type="PackedScene" uid="uid://dxhi6y8n0ywy3" path="res://addons/start_rich_text_editor/example/button.tscn" id="4_8lcd6"]
 
 [sub_resource type="Theme" id="Theme_lwll3"]
 default_font_size = 24
@@ -86,3 +87,6 @@ offset_bottom = 280.0
 script = ExtResource("2_21q88")
 
 [node name="Image" parent="Inspector" instance=ExtResource("3_7cvbf")]
+visible = false
+
+[node name="Button" parent="Inspector" instance=ExtResource("4_8lcd6")]

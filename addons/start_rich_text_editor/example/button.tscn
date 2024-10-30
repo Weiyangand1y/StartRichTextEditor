@@ -1,0 +1,51 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxhi6y8n0ywy3"]
+
+[ext_resource type="Script" path="res://addons/start_rich_text_editor/example/button_inspector.gd" id="1_te6m4"]
+
+[node name="Button" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_te6m4")
+
+[node name="BG" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 34.0
+text = "bg_color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="BG"]
+layout_mode = 0
+offset_left = 104.0
+offset_top = 8.0
+offset_right = 128.0
+offset_bottom = 32.0
+
+[node name="FontColor" type="Label" parent="."]
+layout_mode = 0
+offset_top = 40.0
+offset_right = 97.0
+offset_bottom = 74.0
+text = "font_color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="FontColor"]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 8.0
+offset_right = 160.0
+offset_bottom = 32.0
+
+[node name="BDC" type="Label" parent="."]
+layout_mode = 0
+offset_top = 72.0
+offset_right = 97.0
+offset_bottom = 106.0
+text = "border_color"
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="BDC"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 8.0
+offset_right = 184.0
+offset_bottom = 32.0

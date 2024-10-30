@@ -50,6 +50,7 @@ layout_mode = 0
 offset_left = 16.0
 offset_right = 103.0
 offset_bottom = 31.0
+scale = Vector2(0.7, 0.7)
 min_value = 32.0
 max_value = 512.0
 value = 32.0
@@ -66,6 +67,7 @@ layout_mode = 0
 offset_left = 16.0
 offset_right = 103.0
 offset_bottom = 31.0
+scale = Vector2(0.7, 0.7)
 min_value = 32.0
 max_value = 512.0
 value = 32.0
@@ -79,9 +81,10 @@ text = "scale"
 
 [node name="SpinBox" type="SpinBox" parent="Size/Scale"]
 layout_mode = 0
-offset_left = 48.0
-offset_right = 134.562
+offset_left = 64.0
+offset_right = 151.0
 offset_bottom = 31.0
+scale = Vector2(0.7, 0.7)
 
 [node name="FileDialog" type="FileDialog" parent="."]
 title = "Open a File"
